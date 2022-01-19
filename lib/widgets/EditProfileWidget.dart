@@ -1,8 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-// import 'package:jalali_calendar/jalali_calendar.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
@@ -21,10 +19,33 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
   int selected = 0;
   String gender;
   String _value = "";
+  String madrak = "انتخاب کنید";
+  String city = "انتخاب کنید";
+  String province = "انتخاب کنید";
   String _datetime = '';
   String _format = 'yyyy-mm-dd';
   String _valuePiker = '';
   final bool showTitleActions = false;
+
+  List madarek = [
+    "سیکل و پایین تر",
+    "دیپلم",
+    "کارشناسی",
+    "کارشناسی ارشد",
+    "دکترا و بالاتر",
+  ];
+
+  List listOfCity = [
+    "کرج",
+    "محمدشهر",
+    "آزادگان",
+  ];
+
+  List listOfProvince = [
+    "البرز",
+    "تهران",
+    "مشهد",
+  ];
 
   void _showDatePicker() async {
     final bool showTitleActions = false;
@@ -98,12 +119,12 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
             token: await PrefHelpers.getToken(),
             last_name: lNameController.text,
             birthday: _datetime.toString(),
-            city: cityController.text,
-            degree: degreeController.text,
+            city: city,
+            degree: madrak,
             field_of_study: fieldOfStudyController.text,
             first_name: nameController.text,
             job: jobController.text,
-            province: provinceController.text,
+            province: province,
             gender: gender)
         .then(
       (value) {
@@ -121,6 +142,16 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
 
   @override
   void initState() {
+    if (getProfileBlocInstance.profile.gender == "مرد") {
+      setState(() {
+        selected = 2;
+      });
+    } else if (getProfileBlocInstance.profile.gender == "زن") {
+      setState(() {
+        selected = 1;
+      });
+    }
+
     nameController.text = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.firstName;
@@ -130,25 +161,25 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
     phoneController.text = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.phoneNumber;
-    provinceController.text = (getProfileBlocInstance.profile == null)
+    province = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.province;
-    cityController.text = (getProfileBlocInstance.profile == null)
+    city = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.city;
     jobController.text = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.job;
-    degreeController.text = (getProfileBlocInstance.profile == null)
+    madrak = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.degree;
     fieldOfStudyController.text = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.degree;
 
-    // _datetime = (getProfileBlocInstance.profile == null)
-    //     ? ""
-    //     : getProfileBlocInstance.profile.birthday;
+    _datetime = (getProfileBlocInstance.profile == null)
+        ? ""
+        : getProfileBlocInstance.profile.birthday;
     gender = (getProfileBlocInstance.profile == null)
         ? ""
         : getProfileBlocInstance.profile.gender;
@@ -419,24 +450,28 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
             children: [
               _buildNameField(),
               _buildLNameField(),
-              _buildProvinceField(),
-              _buildCityField(),
-              _buildDegreeField(),
               _buildFieldOfStudyField(),
               _buildJobField(),
               SizedBox(
-                height: size.height * .02,
+                height: size.height * .01,
+              ),
+              _buildProvinceField(),
+              _buildCityField(),
+              _buildDegreeField(),
+              SizedBox(
+                height: size.height * .01,
               ),
               _BDayField(),
               ListTile(
                 title: Text("زن"),
                 leading: Radio(
-                  value: (getProfileBlocInstance.profile.gender == "زن")?1:0,
+                  value: 1,
                   groupValue: selected,
                   onChanged: (value) {
                     setState(() {
                       selected = value;
-                      selected = 1;
+                      // selected = 1;
+
                       gender = "زن";
                     });
                   },
@@ -446,12 +481,12 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
               ListTile(
                 title: Text("مرد"),
                 leading: Radio(
-                  value: (getProfileBlocInstance.profile.gender == "مرد")?2:0,
+                  value: 2,
                   groupValue: selected,
                   onChanged: (value) {
                     setState(() {
                       selected = value;
-                      selected = 2;
+                      // selected = 2;
                       gender = "مرد";
                       // getProfileBlocInstance.profile.gender;
                     });
@@ -565,26 +600,12 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
       height: size.height * .06,
       width: size.width,
       padding: EdgeInsets.symmetric(horizontal: size.width * .06),
-      child: TextFormField(
-        controller: provinceController,
-        onTap: () {},
-        validator: (value) {
-          if (value.isEmpty) {
-            return "استان خود را وارد کنید";
-          }
-        },
-        textInputAction: TextInputAction.next,
-        textAlign: TextAlign.center,
-        decoration: InputDecoration(
-            // suffixIcon: Icon(
-            //   Icons.add,
-            //   color: Colors.amber,
-            // ),
-            hintText: "استان خود را وارد کنید",
-            hintStyle: TextStyle(fontSize: 12),
-            labelText: "استان",
-            labelStyle: TextStyle(color: Colors.black87)),
-      ),
+      margin: EdgeInsets.symmetric(
+          horizontal: size.width * .05, vertical: size.height * .02),
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 2),
+      ]),
+      child: _buildDropDown3(),
     );
   }
 
@@ -593,26 +614,12 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
       height: size.height * .06,
       width: size.width,
       padding: EdgeInsets.symmetric(horizontal: size.width * .06),
-      child: TextFormField(
-        controller: cityController,
-        onTap: () {},
-        validator: (value) {
-          if (value.isEmpty) {
-            return "شهر خود را وارد کنید";
-          }
-        },
-        textInputAction: TextInputAction.next,
-        textAlign: TextAlign.center,
-        decoration: InputDecoration(
-            // suffixIcon: Icon(
-            //   Icons.add,
-            //   color: Colors.amber,
-            // ),
-            hintText: "شهر خود را وارد کنید",
-            hintStyle: TextStyle(fontSize: 12),
-            labelText: "شهر",
-            labelStyle: TextStyle(color: Colors.black87)),
-      ),
+      margin: EdgeInsets.symmetric(
+          horizontal: size.width * .05, vertical: size.height * .02),
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 2),
+      ]),
+      child: _buildDropDown2(),
     );
   }
 
@@ -621,26 +628,12 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
       height: size.height * .06,
       width: size.width,
       padding: EdgeInsets.symmetric(horizontal: size.width * .06),
-      child: TextFormField(
-        controller: degreeController,
-        onTap: () {},
-        validator: (value) {
-          if (value.isEmpty) {
-            return "مدرک تحصیلی خود را وارد کنید";
-          }
-        },
-        textInputAction: TextInputAction.next,
-        textAlign: TextAlign.center,
-        decoration: InputDecoration(
-            // suffixIcon: Icon(
-            //   Icons.add,
-            //   color: Colors.amber,
-            // ),
-            hintText: "مدرک تحصیلی خود را وارد کنید",
-            hintStyle: TextStyle(fontSize: 12),
-            labelText: "مدرک تحصیلی",
-            labelStyle: TextStyle(color: Colors.black87)),
-      ),
+      margin: EdgeInsets.symmetric(
+          horizontal: size.width * .05, vertical: size.height * .02),
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 2),
+      ]),
+      child: _buildDropDown(),
     );
   }
 
@@ -805,6 +798,108 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
           ],
         ),
       ),
+    );
+  }
+
+  _buildDropDown() {
+    return DropdownButton(
+      hint: madrak == null
+          ? Center(child: Text('انتخاب کنید'))
+          : Center(
+              child: Text(
+                madrak,
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+      underline: Container(),
+      isExpanded: true,
+      iconSize: 30.0,
+      style: TextStyle(color: Colors.blue),
+      items: madarek.map(
+        (val) {
+          return DropdownMenuItem<String>(
+            value: val,
+            child: Center(
+              child: Text(val),
+            ),
+          );
+        },
+      ).toList(),
+      onChanged: (val) {
+        setState(
+          () {
+            madrak = val;
+          },
+        );
+      },
+    );
+  }
+
+  _buildDropDown2() {
+    return DropdownButton(
+      hint: city == null
+          ? Center(child: Text('انتخاب کنید'))
+          : Center(
+              child: Text(
+                city,
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+      underline: Container(),
+      isExpanded: true,
+      iconSize: 30.0,
+      style: TextStyle(color: Colors.blue),
+      items: listOfCity.map(
+        (val) {
+          return DropdownMenuItem<String>(
+            value: val,
+            child: Center(
+              child: Text(val),
+            ),
+          );
+        },
+      ).toList(),
+      onChanged: (val) {
+        setState(
+          () {
+            city = val;
+          },
+        );
+      },
+    );
+  }
+
+  _buildDropDown3() {
+    return DropdownButton(
+      hint: province == null
+          ? Center(child: Text('انتخاب کنید'))
+          : Center(
+              child: Text(
+                province,
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+      underline: Container(),
+      isExpanded: true,
+      iconSize: 30.0,
+      style: TextStyle(color: Colors.blue),
+      items: listOfProvince.map(
+        (val) {
+          return DropdownMenuItem<String>(
+            value: val,
+            child: Center(
+              child: Text(val),
+            ),
+          );
+        },
+      ).toList(),
+      onChanged: (val) {
+        setState(
+          () {
+            province = val;
+          },
+        );
+      },
     );
   }
 }

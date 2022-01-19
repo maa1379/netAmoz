@@ -1,3 +1,4 @@
+import 'package:ehyasalamat/helpers/ViewHelpers.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:ehyasalamat/Screen/HomeScareen.dart';
@@ -7,6 +8,7 @@ import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/models/ProfileModel.dart';
 import 'IntroScreen.dart';
+import 'package:connectivity/connectivity.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -16,9 +18,21 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   Size size;
 
+  void checkInternet() async {
+    var con = await (Connectivity().checkConnectivity());
+    if (con == ConnectivityResult.mobile || con == ConnectivityResult.wifi) {
+      getProfileByToken();
+    } else {
+      Future.delayed(Duration(seconds: 3)).then((value) {
+        ViewHelper.showErrorDialog(
+            context, "اینترنت خود را بررسی کنید و مجدد وارد شوید");
+      });
+    }
+  }
+
   @override
   void initState() {
-    getProfileByToken();
+    checkInternet();
     super.initState();
   }
 
