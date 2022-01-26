@@ -3,14 +3,15 @@ import 'package:chewie_audio/chewie_audio.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
 import 'package:ehyasalamat/models/MediaModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
+import 'package:ehyasalamat/plugins/lib/simple_tags.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:simple_tags/simple_tags.dart';
+import 'package:share/share.dart';
 import 'package:video_player/video_player.dart';
 
 class SingleRadioScreen extends StatefulWidget {
-  final MediaModel post;
+  final Result post;
 
   const SingleRadioScreen({
     Key key,
@@ -43,10 +44,8 @@ class _SingleRadioScreenState extends State<SingleRadioScreen> {
   }
 
   Future<void> initializePlayer() async {
-    _videoPlayerController1 =
-        VideoPlayerController.network(widget.post.sourceUrl);
-    _videoPlayerController2 =
-        VideoPlayerController.network(widget.post.sourceUrl);
+    _videoPlayerController1 = VideoPlayerController.network(widget.post.file);
+    _videoPlayerController2 = VideoPlayerController.network(widget.post.file);
     await Future.wait([
       _videoPlayerController1.initialize(),
       _videoPlayerController2.initialize()
@@ -127,12 +126,12 @@ class _SingleRadioScreenState extends State<SingleRadioScreen> {
   _buildTagList() {
     return Expanded(
       child: SimpleTags(
-        content: content,
+        content: widget.post.tags,
         tagTextMaxlines: 1,
         wrapSpacing: 6,
         wrapRunSpacing: 6,
         tagContainerPadding: EdgeInsets.all(6),
-        tagTextStyle: TextStyle(color: Colors.black87, fontSize: 10),
+        tagTextStyle: TextStyle(color: Colors.black87, fontSize: 14),
         // tagIcon: Icon(Icons.clear, size: 12),
         tagContainerDecoration: BoxDecoration(
           color: Color(0xffEFEFEF),
@@ -160,29 +159,17 @@ class _SingleRadioScreenState extends State<SingleRadioScreen> {
       child: Stack(
         children: [
           Container(
-            height: size.height * .2,
+            height: size.height * .25,
             width: size.width,
-            margin: EdgeInsets.only(top: size.height * .05 , left: size.width * .05 , right: size.width * .05),
-            alignment: Alignment.center,
-            child: Column(
-              children: <Widget>[
-                Center(
-                  child: _chewieAudioController != null &&
-                          _chewieAudioController
-                              .videoPlayerController.value.isInitialized
-                      ? ChewieAudio(
-                          controller: _chewieAudioController,
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children:  [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 20),
-                            Text('Loading'),
-                          ],
-                        ),
-                ),
-              ],
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              image: DecorationImage(
+                fit: BoxFit.fill,
+                image: NetworkImage(widget.post.image),
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(200),
+              ),
             ),
           ),
           Align(
@@ -263,9 +250,14 @@ class _SingleRadioScreenState extends State<SingleRadioScreen> {
             "assets/images/Group 128.png",
             width: size.width * .06,
           ),
-          Icon(
-            Icons.share_outlined,
-            size: size.width * .065,
+          GestureDetector(
+            onTap: () {
+              Share.share("پست ما");
+            },
+            child: Icon(
+              Icons.share_outlined,
+              size: size.width * .065,
+            ),
           ),
         ],
       ),
@@ -281,18 +273,46 @@ class _SingleRadioScreenState extends State<SingleRadioScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(200),
+          topLeft: Radius.circular(200),
         ),
       ),
       child: Column(
         children: [
           _buildTopBanner(),
           SizedBox(
-            height: size.height * .03,
+            height: size.height * .025,
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              height: size.height * .06,
+              width: size.width,
+              padding: EdgeInsets.symmetric(horizontal: size.width * .05),
+              child: Center(
+                child: _chewieAudioController != null &&
+                        _chewieAudioController
+                            .videoPlayerController.value.isInitialized
+                    ? ChewieAudio(
+                        controller: _chewieAudioController,
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 20),
+                          Text('Loading'),
+                        ],
+                      ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: size.height * .05,
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: size.width * .1),
             child: AutoSizeText(
-              widget.post.title.rendered,
+              widget.post.title,
               maxLines: 2,
               maxFontSize: 22,
               minFontSize: 10,

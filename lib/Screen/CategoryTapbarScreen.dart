@@ -252,93 +252,32 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
             height: size.height * .02,
           ),
           Expanded(
-            // child: ListView.builder(
-            //   shrinkWrap: true,
-            //   itemCount: postController.postList.length,
-            //   physics: BouncingScrollPhysics(),
-            //   itemExtent: 200,
-            //   controller: scroll,
-            //   scrollDirection: Axis.horizontal,
-            //   itemBuilder: (BuildContext context, int index) {
-            //     Result post = postController.postList[index];
-            //     if(!this.load && index == postController.postList.length - 1){
-            //       return Center(child: CupertinoActivityIndicator(),);
-            //     }
-            //     return WidgetHelper.ItemPostContainer(
-            //       text: post.title,
-            //       size: size,
-            //       image: post.image,
-            //       func: () {
-            //         Navigator.push(
-            //           context,
-            //           PageTransition(
-            //             type: PageTransitionType.fade,
-            //             duration: Duration(milliseconds: 500),
-            //             curve: Curves.easeInOutCubic,
-            //             child: SinglePostScreen(
-            //               post: post,
-            //             ),
-            //           ),
-            //         );
-            //       },
-            //     );
-            //   },
-            // )
-            child: SmartRefresher(
-              enablePullDown: true,
-              enablePullUp: true,
-              header: WaterDropHeader(),
-              footer: CustomFooter(
-                builder: (BuildContext context, LoadStatus mode) {
-                  Widget body;
-                  if (mode == LoadStatus.idle) {
-                    body = Text("بکشید");
-                  } else if (mode == LoadStatus.loading) {
-                    body = CupertinoActivityIndicator();
-                  } else if (mode == LoadStatus.failed) {
-                    body = Text("درحال دریافت");
-                  } else if (mode == LoadStatus.canLoading) {
-                    body = Text("درحال دریافت");
-                  } else {
-                    body = Text("اطللاعاتی دریافت نشد");
-                  }
-                  return Container(
-                    alignment: Alignment.center,
-                    height: size.height * .15,
-                    width: size.width * .2,
-                    child: Center(child: body),
-                  );
-                },
-              ),
-              controller: _refreshController,
-              onRefresh: _onRefresh,
+            child: ListView.builder(
+              itemCount: postController.postList.length,
+              physics: BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
-              onLoading: _onLoading,
-              child: ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-                  Result post = postController.postList[index];
-                  return WidgetHelper.ItemPostContainer(
-                    text: post.title,
-                    size: size,
-                    image: post.image,
-                    func: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          type: PageTransitionType.fade,
-                          duration: Duration(milliseconds: 500),
-                          curve: Curves.easeInOutCubic,
-                          child: SinglePostScreen(
-                            post: post,
-                          ),
+              itemBuilder: (BuildContext context, int index) {
+                Result post = postController.postList[index];
+                return WidgetHelper.ItemPostContainer(
+                  text: post.title,
+                  size: size,
+                  image: post.image,
+                  func: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.fade,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeInOutCubic,
+                        child: SinglePostScreen(
+                          post: post,
                         ),
-                      );
-                    },
-                  );
-                },
-                itemCount: postController.postList.length,
-              ),
-            ),
+                      ),
+                    );
+                  },
+                );
+              },
+            )
           ),
         ],
       ),
@@ -690,3 +629,62 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
     );
   }
 }
+
+
+
+// SmartRefresher(
+// enablePullDown: true,
+// enablePullUp: true,
+// header: WaterDropHeader(),
+// footer: CustomFooter(
+// builder: (BuildContext context, LoadStatus mode) {
+// Widget body;
+// if (mode == LoadStatus.idle) {
+// body = Text("بکشید");
+// } else if (mode == LoadStatus.loading) {
+// body = CupertinoActivityIndicator();
+// } else if (mode == LoadStatus.failed) {
+// body = Text("درحال دریافت");
+// } else if (mode == LoadStatus.canLoading) {
+// body = Text("درحال دریافت");
+//
+// } else {
+// body = Text("اطللاعاتی دریافت نشد");
+// }
+// return Container(
+// alignment: Alignment.center,
+// height: size.height * .15,
+// width: size.width * .2,
+// child: Center(child: body),
+// );
+// },
+// ),
+// controller: _refreshController,
+// onRefresh: _onRefresh,
+// scrollDirection: Axis.horizontal,
+// onLoading: _onLoading,
+// child: ListView.builder(
+// itemBuilder: (BuildContext context, int index) {
+// Result post = postController.postList[index];
+// return WidgetHelper.ItemPostContainer(
+// text: post.title,
+// size: size,
+// image: post.image,
+// func: () {
+// Navigator.push(
+// context,
+// PageTransition(
+// type: PageTransitionType.fade,
+// duration: Duration(milliseconds: 500),
+// curve: Curves.easeInOutCubic,
+// child: SinglePostScreen(
+// post: post,
+// ),
+// ),
+// );
+// },
+// );
+// },
+// itemCount: postController.postList.length,
+// ),
+// ),

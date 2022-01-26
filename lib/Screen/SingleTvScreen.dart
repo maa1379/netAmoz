@@ -2,9 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:chewie/chewie.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
+import 'package:ehyasalamat/plugins/lib/simple_tags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:simple_tags/simple_tags.dart';
+import 'package:share/share.dart';
 import 'package:video_player/video_player.dart';
 
 class SingleTvScreen extends StatefulWidget {
@@ -59,16 +60,7 @@ class _SingleTvScreenState extends State<SingleTvScreen> {
 
 
   String title;
-  final List<String> content = [
-    'دکتر روازاده',
-    'جوابیه',
-    'سازمان نظام پزشکی',
-    'طب اسلامی ایرانی',
-    'سازمان نظام پزشکی',
-    'جوابیه',
-    'سازمان نظام پزشکی',
-    'طب اسلامی ایرانی',
-  ];
+
 
 
 
@@ -119,12 +111,12 @@ class _SingleTvScreenState extends State<SingleTvScreen> {
   _buildTagList() {
     return Expanded(
       child: SimpleTags(
-        content: content,
+        content: widget.post.tags,
         tagTextMaxlines: 1,
         wrapSpacing: 6,
         wrapRunSpacing: 6,
         tagContainerPadding: EdgeInsets.all(6),
-        tagTextStyle: TextStyle(color: Colors.black87, fontSize: 10),
+        tagTextStyle: TextStyle(color: Colors.black87, fontSize: 14),
         // tagIcon: Icon(Icons.clear, size: 12),
         tagContainerDecoration: BoxDecoration(
           color: Color(0xffEFEFEF),
@@ -239,9 +231,14 @@ class _SingleTvScreenState extends State<SingleTvScreen> {
             "assets/images/Group 128.png",
             width: size.width * .06,
           ),
-          Icon(
-            Icons.share_outlined,
-            size: size.width * .065,
+          GestureDetector(
+            onTap: (){
+              Share.share("پست ها");
+            },
+            child: Icon(
+              Icons.share_outlined,
+              size: size.width * .065,
+            ),
           ),
         ],
       ),

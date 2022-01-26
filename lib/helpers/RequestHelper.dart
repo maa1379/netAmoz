@@ -462,6 +462,50 @@ class RequestHelper {
     return apiResult;
   }
 
+
+
+  static Future<ApiResult> search({
+    String token,
+    String q,
+  }) async {
+    String url = "http://87.107.172.122/api/home/posts_search?q=$q";
+    print(url);
+    http.Response response = await http.get(Uri.parse(url), headers: {
+      'Accept': 'application/json',
+      HttpHeaders.authorizationHeader: "Bearer ${token}"
+    });
+    ApiResult apiResult = new ApiResult();
+    apiResult.statusCode = response.statusCode;
+    if (response.statusCode == 200) {
+      try {
+        print(response.body);
+        Map data = jsonDecode(response.body);
+        apiResult.isDone = data['isDone'] == true;
+        apiResult.requestedMethod = data['requestedMethod'].toString();
+        apiResult.data = data['data'];
+      } catch (e) {
+        apiResult.isDone = false;
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+
+        apiResult.requestedMethod = 'search';
+        apiResult.data = response.body;
+      }
+    } else {
+      apiResult.isDone = true;
+    }
+    print("\nRequest url: $url\nResponse: {"
+        "status: ${response.statusCode}\n"
+        "isDone: ${apiResult.isDone}\n"
+        "data: ${apiResult.data}"
+        "}");
+    return apiResult;
+  }
+
+
   static Future<ApiResult> informs({String role, String token}) async {
     String url = "http://87.107.172.122/api/informs/informs/$role";
     print(url);

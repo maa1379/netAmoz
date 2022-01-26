@@ -27,6 +27,14 @@ class PrefHelpers {
   }
 
 
+  static Future<void> setList(List<String> list) async {
+    await Prefs.setList(list,'list');
+  }
+
+  static Future<List<String>> getList() async {
+    return await Prefs.getList('list');
+  }
+
 // static Future<bool> logOut() async {
   //   await Prefs.set('mobile', null);
   //   await Prefs.set('transmissionId', null);

@@ -481,7 +481,7 @@ class WidgetHelper {
                       backgroundColor: Colors.transparent,
                       isDismissible: true,
                       enableDrag: false,
-                      context: context,
+                      context: Get.context,
                       builder: (context) {
                         return SearchModalWidget();
                       },

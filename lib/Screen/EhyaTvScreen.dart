@@ -575,9 +575,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     } else if (post.title
             .toLowerCase()
             .contains(searchTextEditingController.text) ||
-        post.title
-            .toLowerCase()
-            .contains(searchTextEditingController.text)) {
+        post.title.toLowerCase().contains(searchTextEditingController.text)) {
       return GestureDetector(
         onTap: () {
           Get.to(SingleTvScreen(
@@ -729,7 +727,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
           crossAxisCount: 3,
           crossAxisSpacing: 5.0,
           mainAxisSpacing: 5.0,
-          childAspectRatio: 0.6,
+          childAspectRatio: 0.52,
         ),
         itemBuilder: itemGridBuilder,
       ),
@@ -746,7 +744,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
           ));
         },
         child: Container(
-          height: size.height * .4,
+          height: size.height * .42,
           width: size.width * .3,
           alignment: Alignment.center,
           margin: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
@@ -766,10 +764,13 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
             children: [
               Flexible(
                 flex: 4,
-                child: Image.asset(
-                  "assets/images/thumbnail.png",
-                  fit: BoxFit.cover,
-                ),
+                child: Get.find<PostController>().loading.value == true
+                    ? FadeInImage.assetNetwork(
+                        placeholder: "assets/anim/loading.gif",
+                        image: post.image,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset("assets/anim/loading.gif"),
               ),
               SizedBox(
                 height: size.height * .005,
@@ -819,15 +820,14 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                 ),
               ),
               Flexible(
-                flex: 1,
+                flex: 2,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: size.width * .01, vertical: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
                     children: [
                       SizedBox(
-                        width: size.width * .02,
+                        height: size.width * .01,
                       ),
                       AutoSizeText(
                         post.datePublished,
@@ -842,13 +842,21 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: size.width * .01,
+                        height: size.width * .02,
                       ),
-                      Image.asset("assets/images/Union 2.png"),
-                      SizedBox(
-                        width: size.width * .01,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/Union 2.png",
+                            width: size.width * .05,
+                          ),
+                          SizedBox(
+                            width: size.width * .05,
+                          ),
+                          Image.asset("assets/images/Comment.png"),
+                        ],
                       ),
-                      Image.asset("assets/images/Comment.png"),
                     ],
                   ),
                 ),
@@ -860,9 +868,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     } else if (post.title
             .toLowerCase()
             .contains(searchTextEditingController.text) ||
-        post.title
-            .toLowerCase()
-            .contains(searchTextEditingController.text)) {
+        post.title.toLowerCase().contains(searchTextEditingController.text)) {
       return GestureDetector(
         onTap: () {
           Get.to(SingleTvScreen(
@@ -1013,23 +1019,23 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     );
   }
 
-  // void getPosts() async {
-  //   this.setState(() {
-  //     this.isLoading = page == 1;
-  //   });
-  //   ApiResult result = await RequestHelper.search(
-  //     '',
-  //     'media',
-  //     'video',
-  //     this.page,
-  //     this.mainId,
-  //   );
-  //
-  //   this.setState(() {
-  //     this
-  //         .listOfVideos
-  //         .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
-  //     this.isLoading = false;
-  //   });
-  // }
+// void getPosts() async {
+//   this.setState(() {
+//     this.isLoading = page == 1;
+//   });
+//   ApiResult result = await RequestHelper.search(
+//     '',
+//     'media',
+//     'video',
+//     this.page,
+//     this.mainId,
+//   );
+//
+//   this.setState(() {
+//     this
+//         .listOfVideos
+//         .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
+//     this.isLoading = false;
+//   });
+// }
 }

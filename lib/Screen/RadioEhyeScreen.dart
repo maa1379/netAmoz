@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:animate_icons/animate_icons.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/loading.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
 import 'package:ehyasalamat/models/MediaModel.dart';
+import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -31,6 +33,8 @@ class RadioEhyeScreen extends StatefulWidget {
 }
 
 class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
+  PostController postController = Get.find<PostController>();
+
   Size size;
   int _current = 0;
   bool isActive = false;
@@ -45,7 +49,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
       ];
 
   TextEditingController searchTextEditingController = TextEditingController();
-
 
   // List get imgList => this.listOfAudios.map((e) => e.);
 
@@ -96,9 +99,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
   }
 
   _buildCategoriesItem() {
-    if (this.isLoading) {
-      return LoadingDialog();
-    }
     return SingleChildScrollView(
       child: AnimationLimiter(
         child: Stack(
@@ -133,13 +133,13 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
         children: [
           Expanded(
             child: CarouselSlider(
-              items: listOfAudios.map((i) {
+              items: postController.rPostList.map((i) {
                 return Builder(
                   builder: (BuildContext context) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        "assets/images/636578_472.jpg",
+                      child: Image.network(
+                        i.image,
                         fit: BoxFit.cover,
                         width: double.maxFinite,
                       ),
@@ -178,7 +178,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                 _current = value;
               });
             },
-            count: listOfAudios.length,
+            count: postController.rPostList.length,
             effect: ExpandingDotsEffect(
                 activeDotColor: Colors.black54,
                 dotWidth: size.width * .016,
@@ -468,32 +468,16 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
 
   _buildListITem() {
     return Expanded(
-      child: FRefresh(
-        controller: controller,
-        footerHeight: this.size.height / 8,
-        child: ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: this.listOfAudios.length,
-          itemBuilder: itemBuilder,
-        ),
-        footer: Container(
-          height: this.size.height / 8,
-          child: LoadingDialog(),
-        ),
-        onLoad: () async {
-          this.setState(() {
-            this.page++;
-          });
-          // await this.getPosts();
-          controller.finishRefresh();
-        },
+      child: ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: postController.rPostList.length,
+        itemBuilder: itemBuilder,
       ),
     );
   }
 
   Widget itemBuilder(BuildContext context, int index) {
-    MediaModel post = this.listOfAudios[index];
+    Result post = postController.rPostList[index];
     if (searchTextEditingController.text.isEmpty) {
       return GestureDetector(
         onTap: () {
@@ -538,7 +522,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
                       child: AutoSizeText(
-                        post.title.rendered,
+                        post.title,
                         maxLines: 2,
                         maxFontSize: 22,
                         minFontSize: 12,
@@ -559,9 +543,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                       width: size.width * .55,
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
-                      child: Html(
-                        data: post.caption.rendered,
-                      ),
+                      child: Html(data: post.shortDescription),
                       // AutoSizeText(
                       //
                       //       .replaceAll('<p>', '')
@@ -646,12 +628,10 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
           ),
         ),
       );
-    } else if (post.title.rendered
+    } else if (post.title
             .toLowerCase()
             .contains(searchTextEditingController.text) ||
-        post.title.rendered
-            .toLowerCase()
-            .contains(searchTextEditingController.text)) {
+        post.title.toLowerCase().contains(searchTextEditingController.text)) {
       return GestureDetector(
         onTap: () {
           Get.to(SingleRadioScreen(
@@ -695,7 +675,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
                       child: AutoSizeText(
-                        post.title.rendered,
+                        post.title,
                         maxLines: 2,
                         maxFontSize: 22,
                         minFontSize: 12,
@@ -717,7 +697,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
                       child: Html(
-                        data: post.caption.rendered,
+                        data: post.shortDescription,
                       ),
                       // AutoSizeText(
                       //
@@ -747,7 +727,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                             width: size.width * .01,
                           ),
                           AutoSizeText(
-                            "1400/05/23",
+                            post.datePublished,
                             maxLines: 4,
                             maxFontSize: 22,
                             minFontSize: 6,
@@ -811,13 +791,13 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
   _buildGridITem() {
     return Expanded(
       child: GridView.builder(
-        itemCount: listOfAudios.length,
+        itemCount: postController.rPostList.length,
         physics: BouncingScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 5.0,
           mainAxisSpacing: 5.0,
-          childAspectRatio: 0.6,
+          childAspectRatio: 0.52,
         ),
         itemBuilder: itemGridBuilder,
       ),
@@ -825,7 +805,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
   }
 
   Widget itemGridBuilder(BuildContext context, int index) {
-    MediaModel post = this.listOfAudios[index];
+    Result post = postController.rPostList[index];
     if (searchTextEditingController.text.isEmpty) {
       return GestureDetector(
         onTap: () {
@@ -865,7 +845,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
               Flexible(
                 flex: 1,
                 child: AutoSizeText(
-                  post.title.rendered,
+                  post.title,
                   maxLines: 2,
                   maxFontSize: 22,
                   minFontSize: 12,
@@ -907,18 +887,17 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                 ),
               ),
               Flexible(
-                flex: 1,
+                flex: 2,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: size.width * .01, vertical: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
                     children: [
                       SizedBox(
-                        width: size.width * .02,
+                        height: size.width * .01,
                       ),
                       AutoSizeText(
-                        Jalali.fromDateTime(post.date).jDate(),
+                        post.datePublished,
                         maxLines: 4,
                         maxFontSize: 22,
                         minFontSize: 6,
@@ -930,13 +909,21 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: size.width * .01,
+                        height: size.width * .02,
                       ),
-                      Image.asset("assets/images/Union 2.png"),
-                      SizedBox(
-                        width: size.width * .01,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/Union 2.png",
+                            width: size.width * .05,
+                          ),
+                          SizedBox(
+                            width: size.width * .05,
+                          ),
+                          Image.asset("assets/images/Comment.png"),
+                        ],
                       ),
-                      Image.asset("assets/images/Comment.png"),
                     ],
                   ),
                 ),
@@ -945,12 +932,10 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
           ),
         ),
       );
-    } else if (post.title.rendered
+    } else if (post.title
             .toLowerCase()
             .contains(searchTextEditingController.text) ||
-        post.title.rendered
-            .toLowerCase()
-            .contains(searchTextEditingController.text)) {
+        post.title.toLowerCase().contains(searchTextEditingController.text)) {
       return GestureDetector(
         onTap: () {
           Get.to(SingleRadioScreen(
@@ -989,7 +974,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
               Flexible(
                 flex: 1,
                 child: AutoSizeText(
-                  post.title.rendered,
+                  post.title,
                   maxLines: 2,
                   maxFontSize: 22,
                   minFontSize: 12,
@@ -1042,7 +1027,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                         width: size.width * .02,
                       ),
                       AutoSizeText(
-                        Jalali.fromDateTime(post.date).jDate(),
+                        post.datePublished,
                         maxLines: 4,
                         maxFontSize: 22,
                         minFontSize: 6,
@@ -1100,24 +1085,24 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
       maxLength: 11,
     );
   }
-  //
-  // void getPosts() async {
-  //   this.setState(() {
-  //     this.isLoading = page == 1;
-  //   });
-  //   ApiResult result = await RequestHelper.search(
-  //     '',
-  //     'media',
-  //     'audio',
-  //     this.page,
-  //     this.mainId,
-  //   );
-  //
-  //   this.setState(() {
-  //     this
-  //         .listOfAudios
-  //         .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
-  //     this.isLoading = false;
-  //   });
-  // }
+//
+// void getPosts() async {
+//   this.setState(() {
+//     this.isLoading = page == 1;
+//   });
+//   ApiResult result = await RequestHelper.search(
+//     '',
+//     'media',
+//     'audio',
+//     this.page,
+//     this.mainId,
+//   );
+//
+//   this.setState(() {
+//     this
+//         .listOfAudios
+//         .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
+//     this.isLoading = false;
+//   });
+// }
 }
