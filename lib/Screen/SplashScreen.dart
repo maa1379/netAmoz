@@ -1,5 +1,8 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/ViewHelpers.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:ehyasalamat/Screen/HomeScareen.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
@@ -17,6 +20,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Size size;
+
 
   void checkInternet() async {
     var con = await (Connectivity().checkConnectivity());
@@ -41,6 +45,8 @@ class _SplashScreenState extends State<SplashScreen> {
       print(value.data);
       if (value.isDone) {
         getProfileBlocInstance.getProfile(ProfileModel.fromJson(value.data));
+        Get.put(PostController());
+        Get.put(CategoryController());
         Future.delayed(Duration(seconds: 5)).then((value) {
           NavHelper.pushR(context, HomeScreen());
         });
@@ -85,6 +91,25 @@ class _SplashScreenState extends State<SplashScreen> {
                 alignment: Alignment.bottomCenter,
                 child: Lottie.asset("assets/anim/loading (2).json",
                     width: size.width * .5),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: Get.width * .105, bottom: Get.height * .017),
+                  child: AutoSizeText(
+                    "نظام پزشکی 58290",
+                    maxFontSize: 22,
+                    minFontSize: 4,
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "yekanB"),
+                  ),
+                ),
               ),
             ],
           ),

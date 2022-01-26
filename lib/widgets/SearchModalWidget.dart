@@ -30,7 +30,7 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
   int postsPage = 1;
   int videosPage = 1;
   int audiosPage = 1;
-  List<PostModel> listOfPosts = [];
+  List<Result> listOfPosts = [];
   List<MediaModel> listOfVideos = [];
   List<MediaModel> listOfAudio = [];
 
@@ -39,123 +39,123 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
   ScrollController audiosController = ScrollController();
   String query = "";
 
-  void search(String query) async {
-    this.setState(() {
-      this.query = query;
-      this.isLoading = true;
-    });
-
-    ApiResult result =
-        await RequestHelper.search(query, 'posts', '', postsPage);
-
-    if (result.isDone) {
-      this.listOfPosts = PostModel.listFromJson(jsonDecode(result.data));
-    }
-    result = await RequestHelper.search(query, 'media', 'video', videosPage);
-
-    if (result.isDone) {
-      this.listOfVideos = MediaModel.listFromJson(jsonDecode(result.data));
-    }
-    result = await RequestHelper.search(query, 'media', 'audio', audiosPage);
-    this.setState(() {
-      this.hasSearched = true;
-      this.isLoading = false;
-    });
-    if (result.isDone) {
-      this.listOfAudio = MediaModel.listFromJson(jsonDecode(result.data));
-    }
-    this.setListeners();
-  }
+  // void search(String query) async {
+  //   this.setState(() {
+  //     this.query = query;
+  //     this.isLoading = true;
+  //   });
+  //
+  //   ApiResult result =
+  //       await RequestHelper.search(query, 'posts', '', postsPage);
+  //
+  //   if (result.isDone) {
+  //     this.listOfPosts = PostModel.listFromJson(jsonDecode(result.data));
+  //   }
+  //   result = await RequestHelper.search(query, 'media', 'video', videosPage);
+  //
+  //   if (result.isDone) {
+  //     this.listOfVideos = MediaModel.listFromJson(jsonDecode(result.data));
+  //   }
+  //   result = await RequestHelper.search(query, 'media', 'audio', audiosPage);
+  //   this.setState(() {
+  //     this.hasSearched = true;
+  //     this.isLoading = false;
+  //   });
+  //   if (result.isDone) {
+  //     this.listOfAudio = MediaModel.listFromJson(jsonDecode(result.data));
+  //   }
+  //   this.setListeners();
+  // }
 
   final _formKey = GlobalKey<FormState>();
   TextEditingController searchTextEditingController = TextEditingController();
 
-  void setListeners() async {
-    this.postsController.addListener(() async {
-      if (this.postsController.hasClients &&
-          this.postsController.offset >=
-              this.postsController.position.maxScrollExtent) {
-        this.setState(() {
-          this.isLoading = true;
-          postsPage++;
-        });
-        ApiResult result =
-            await RequestHelper.search(query, 'posts', '', postsPage);
-
-        if (result.isDone) {
-          this
-              .listOfPosts
-              .addAll(PostModel.listFromJson(jsonDecode(result.data)));
-        }
-        this.setState(() {
-          this.isLoading = false;
-          Future.delayed(Duration(milliseconds: 100), () {
-            this.postsController.animateTo(
-                  this.postsController.position.maxScrollExtent - 10,
-                  duration: Duration(milliseconds: 250),
-                  curve: Curves.easeIn,
-                );
-          });
-        });
-      }
-    });
-    this.videosController.addListener(() async {
-      if (this.videosController.hasClients &&
-          this.videosController.offset >=
-              this.videosController.position.maxScrollExtent) {
-        this.setState(() {
-          this.isLoading = true;
-          videosPage++;
-        });
-        ApiResult result =
-            await RequestHelper.search(query, 'media', 'video', videosPage);
-
-        if (result.isDone) {
-          this
-              .listOfVideos
-              .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
-        }
-        this.setState(() {
-          this.isLoading = false;
-          Future.delayed(Duration(milliseconds: 100), () {
-            this.videosController.animateTo(
-                  this.videosController.position.maxScrollExtent - 10,
-                  duration: Duration(milliseconds: 250),
-                  curve: Curves.easeIn,
-                );
-          });
-        });
-      }
-    });
-    this.audiosController.addListener(() async {
-      if (this.audiosController.hasClients &&
-          this.audiosController.offset >=
-              this.audiosController.position.maxScrollExtent) {
-        this.setState(() {
-          this.isLoading = true;
-          audiosPage++;
-        });
-        ApiResult result =
-            await RequestHelper.search(query, 'media', 'audio', audiosPage);
-
-        if (result.isDone) {
-          this
-              .listOfAudio
-              .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
-        }
-        this.setState(() {
-          this.isLoading = false;
-          Future.delayed(Duration(milliseconds: 100), () {
-            this.audiosController.animateTo(
-                  this.audiosController.position.maxScrollExtent - 10,
-                  duration: Duration(milliseconds: 250),
-                  curve: Curves.easeIn,
-                );
-          });
-        });
-      }
-    });
-  }
+  // void setListeners() async {
+  //   this.postsController.addListener(() async {
+  //     if (this.postsController.hasClients &&
+  //         this.postsController.offset >=
+  //             this.postsController.position.maxScrollExtent) {
+  //       this.setState(() {
+  //         this.isLoading = true;
+  //         postsPage++;
+  //       });
+  //       ApiResult result =
+  //           await RequestHelper.search(query, 'posts', '', postsPage);
+  //
+  //       if (result.isDone) {
+  //         this
+  //             .listOfPosts
+  //             .addAll(PostModel.listFromJson(jsonDecode(result.data)));
+  //       }
+  //       this.setState(() {
+  //         this.isLoading = false;
+  //         Future.delayed(Duration(milliseconds: 100), () {
+  //           this.postsController.animateTo(
+  //                 this.postsController.position.maxScrollExtent - 10,
+  //                 duration: Duration(milliseconds: 250),
+  //                 curve: Curves.easeIn,
+  //               );
+  //         });
+  //       });
+  //     }
+  //   });
+  //   this.videosController.addListener(() async {
+  //     if (this.videosController.hasClients &&
+  //         this.videosController.offset >=
+  //             this.videosController.position.maxScrollExtent) {
+  //       this.setState(() {
+  //         this.isLoading = true;
+  //         videosPage++;
+  //       });
+  //       ApiResult result =
+  //           await RequestHelper.search(query, 'media', 'video', videosPage);
+  //
+  //       if (result.isDone) {
+  //         this
+  //             .listOfVideos
+  //             .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
+  //       }
+  //       this.setState(() {
+  //         this.isLoading = false;
+  //         Future.delayed(Duration(milliseconds: 100), () {
+  //           this.videosController.animateTo(
+  //                 this.videosController.position.maxScrollExtent - 10,
+  //                 duration: Duration(milliseconds: 250),
+  //                 curve: Curves.easeIn,
+  //               );
+  //         });
+  //       });
+  //     }
+  //   });
+  //   this.audiosController.addListener(() async {
+  //     if (this.audiosController.hasClients &&
+  //         this.audiosController.offset >=
+  //             this.audiosController.position.maxScrollExtent) {
+  //       this.setState(() {
+  //         this.isLoading = true;
+  //         audiosPage++;
+  //       });
+  //       ApiResult result =
+  //           await RequestHelper.search(query, 'media', 'audio', audiosPage);
+  //
+  //       if (result.isDone) {
+  //         this
+  //             .listOfAudio
+  //             .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
+  //       }
+  //       this.setState(() {
+  //         this.isLoading = false;
+  //         Future.delayed(Duration(milliseconds: 100), () {
+  //           this.audiosController.animateTo(
+  //                 this.audiosController.position.maxScrollExtent - 10,
+  //                 duration: Duration(milliseconds: 250),
+  //                 curve: Curves.easeIn,
+  //               );
+  //         });
+  //       });
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +307,7 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
         color: Color(0xfff8ffff),
         size: size,
         onChange: (String str) async {
-          this.search(str);
+          // this.search(str);
         },
         fontSize: 16,
         controller: searchTextEditingController,
@@ -491,17 +491,17 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
                     SizedBox(
                       height: 8.0,
                     ),
-                    Expanded(
-                      child: ListView.builder(
-                        controller: this.videosController,
-                        itemBuilder: (BuildContext context, int index) =>
-                            this.buildMedia(
-                          this.listOfVideos[index],
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: this.listOfVideos.length,
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: ListView.builder(
+                    //     controller: this.videosController,
+                    //     itemBuilder: (BuildContext context, int index) =>
+                    //         this.buildMedia(
+                    //       this.listOfVideos[index],
+                    //     ),
+                    //     scrollDirection: Axis.horizontal,
+                    //     itemCount: this.listOfVideos.length,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -534,17 +534,17 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
                     SizedBox(
                       height: 8.0,
                     ),
-                    Expanded(
-                      child: ListView.builder(
-                        controller: this.audiosController,
-                        itemBuilder: (BuildContext context, int index) =>
-                            this.buildMedia(
-                          this.listOfAudio[index],
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: this.listOfAudio.length,
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: ListView.builder(
+                    //     controller: this.audiosController,
+                    //     itemBuilder: (BuildContext context, int index) =>
+                    //         this.buildMedia(
+                    //       this.listOfAudio[index],
+                    //     ),
+                    //     scrollDirection: Axis.horizontal,
+                    //     itemCount: this.listOfAudio.length,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -558,11 +558,11 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
     );
   }
 
-  Widget buildPost(PostModel post) {
+  Widget buildPost(Result post) {
     return WidgetHelper.ItemPostContainer(
-      text: post.title.rendered,
+      text: post.title,
       size: size,
-      image: post.thumbnail,
+      image: post.image,
       func: () {
         Navigator.push(
           context,
@@ -579,24 +579,24 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
     );
   }
 
-  Widget buildMedia(MediaModel post) {
-    return WidgetHelper.ItemPostContainer(
-      text: post.title.rendered,
-      size: size,
-      image: post.mimeType.startsWith('video')
-          ? "assets/images/thumbnail.png"
-          : "assets/images/audio-thumbnail.png",
-      func: () {
-        if (post.mimeType.startsWith('video')) {
-          Get.to(SingleTvScreen(
-            post: post,
-          ));
-        } else if (post.mimeType.startsWith('audio')) {
-          Get.to(SingleRadioScreen(
-            post: post,
-          ));
-        }
-      },
-    );
-  }
+  // Widget buildMedia(PostModel post) {
+  //   return WidgetHelper.ItemPostContainer(
+  //     text: post.title,
+  //     size: size,
+  //     image: post.mimeType.startsWith('video')
+  //         ? "assets/images/thumbnail.png"
+  //         : "assets/images/audio-thumbnail.png",
+  //     func: () {
+  //       if (post.mimeType.startsWith('video')) {
+  //         Get.to(SingleTvScreen(
+  //           post: post,
+  //         ));
+  //       } else if (post.mimeType.startsWith('audio')) {
+  //         Get.to(SingleRadioScreen(
+  //           post: post,
+  //         ));
+  //       }
+  //     },
+  //   );
+  // }
 }

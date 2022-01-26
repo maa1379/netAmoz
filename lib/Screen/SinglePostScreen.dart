@@ -7,7 +7,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:simple_tags/simple_tags.dart';
 
 class SinglePostScreen extends StatefulWidget {
-  final PostModel post;
+  final Result post;
 
   const SinglePostScreen({
     Key key,
@@ -117,7 +117,7 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
               color: Colors.red,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: NetworkImage(widget.post.thumbnail),
+                image: NetworkImage(widget.post.title),
               ),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(200),
@@ -232,7 +232,7 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: size.width * .1),
             child: AutoSizeText(
-              widget.post.title.rendered,
+              widget.post.title,
               maxLines: 2,
               maxFontSize: 22,
               minFontSize: 10,
@@ -253,7 +253,7 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Center(
-              child: Html(data: widget.post.excerpt.rendered)
+              child: Html(data: widget.post.shortDescription)
             ),
           ),
           SizedBox(
@@ -261,7 +261,7 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: size.width * .06),
-            child: Html(data: widget.post.content.rendered,)
+            child: Html(data: widget.post.category)
           ),
           SizedBox(
             height: size.height * .1,

@@ -9,6 +9,8 @@ import 'package:ehyasalamat/models/DrawerModel.dart';
 import 'package:ehyasalamat/models/TabBarModel.dart';
 import 'package:ehyasalamat/widgets/ConsultingWidget.dart';
 import 'package:ehyasalamat/widgets/EditProfileWidget.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
@@ -27,7 +29,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Size size;
   int _index = 0;
   int isPage = 2;
@@ -37,10 +39,12 @@ class _HomeScreenState extends State<HomeScreen> {
   GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
   final GlobalKey<ScaffoldState> key = GlobalKey();
   final GlobalKey<NavigatorState> _key = new GlobalKey<NavigatorState>();
+  TabController tabController;
 
   @override
   void initState() {
     super.initState();
+    tabController = TabController(initialIndex: _index, length: 3, vsync: this);
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (!getProfileBlocInstance.profile.profileDone) {
         AlertHelpers.UpdateProfileDialog(
@@ -57,27 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
-
-  List<TabBarModel> TabBarList = [
-    TabBarModel(
-      id: 1,
-      selected: true,
-      title: "دسته بندی",
-      image: "assets/images/041-folder.png",
-    ),
-    TabBarModel(
-      id: 2,
-      selected: false,
-      title: "احیا تی وی",
-      image: "assets/images/Component 18 – 1.png",
-    ),
-    TabBarModel(
-      id: 3,
-      selected: false,
-      title: "رادیو احیا",
-      image: "assets/images/Component 18 – 1.png",
-    ),
-  ];
 
   List<DrawerModel> DrawerList = [
     DrawerModel(
@@ -221,16 +204,10 @@ class _HomeScreenState extends State<HomeScreen> {
           WidgetHelper.appBar(size: size, key: key, context: context),
           _buildTapBar(),
           Expanded(
-            child: PageView(
-              controller: pageController,
+            child: TabBarView(
+              controller: tabController,
               physics: NeverScrollableScrollPhysics(),
-              onPageChanged: (page) {
-                setState(
-                  () {
-                    this._index = page;
-                  },
-                );
-              },
+              dragStartBehavior: DragStartBehavior.down,
               children: [
                 CategoryTapbarScreen(),
                 EhyaTvScreen(),
@@ -245,93 +222,139 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _buildTapBar() {
     return Container(
-      height: size.height * .08,
-      width: size.width,
-      margin: EdgeInsets.symmetric(horizontal: size.width * .02),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(100),
-      ),
+        height: size.height * .08,
+        width: size.width,
+        margin: EdgeInsets.symmetric(horizontal: size.width * .02),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: TabBar(
+          controller: tabController,
+          onTap: (page) {
+            setState(() {
+              this._index = page;
+            });
+          },
+          indicatorColor: Colors.black,
+          physics: NeverScrollableScrollPhysics(),
+          indicatorSize: TabBarIndicatorSize.label,
+          padding: EdgeInsetsGeometry.lerp(
+              EdgeInsets.only(bottom: 5), EdgeInsets.zero, 0),
+          tabs: [
+            tabBarWidget(
+                image: "assets/images/041-folder.png", title: "دسته بندی ها"),
+            tabBarWidget(
+                image: "assets/images/Component 18 – 1.png",
+                title: "احیا تی وی"),
+            tabBarWidget(
+                image: "assets/images/Component 18 – 1.png",
+                title: "رادیو احیا"),
+          ],
+        ));
+  }
+
+  tabBarWidget({String image, String title}) {
+    return Container(
+      height: size.height * .05,
+      width: size.width * .17,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: TabBarList.length,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.width * .07),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          TabBarList.forEach(
-                            (element) {
-                              element.selected = false;
-                              setState(
-                                () {
-                                  TabBarList[index].selected = true;
-                                  this.isActive = TabBarList[index].selected;
-                                },
-                              );
-                              pageController.animateToPage(
-                                index,
-                                curve: Curves.easeIn,
-                                duration: Duration(microseconds: 175),
-                              );
-                            },
-                          );
-                        },
-                        child: Container(
-                          height: size.height * .05,
-                          width: size.width * .17,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                TabBarList[index].image,
-                                width: size.width * .06,
-                                color: Colors.black,
-                              ),
-                              SizedBox(
-                                height: size.height * .005,
-                              ),
-                              AutoSizeText(
-                                TabBarList[index].title,
-                                maxLines: 1,
-                                maxFontSize: 22,
-                                minFontSize: 10,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      (TabBarList[index].selected)
-                          ? Container(
-                              // margin: EdgeInsets.only(left: this.size.width * .01),
-                              height: size.height * .002,
-                              width: this.size.width * .2,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            )
-                          : Container(),
-                    ],
-                  ),
-                );
-              },
-            ),
+          Image.asset(
+            image,
+            width: size.width * .06,
+            color: Colors.black,
+          ),
+          SizedBox(
+            height: size.height * .005,
+          ),
+          AutoSizeText(
+            title,
+            maxLines: 1,
+            maxFontSize: 22,
+            minFontSize: 10,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black, fontSize: 12),
           ),
         ],
       ),
     );
   }
 
+  // Expanded(
+  // child: ListView.builder(
+  // itemCount: TabBarList.length,
+  // scrollDirection: Axis.horizontal,
+  // itemBuilder: (BuildContext context, int index) {
+  // return Padding(
+  // padding: EdgeInsets.symmetric(horizontal: size.width * .07),
+  // child: Column(
+  // mainAxisAlignment: MainAxisAlignment.center,
+  // children: [
+  // GestureDetector(
+  // onTap: () {
+  // TabBarList.forEach(
+  // (element) {
+  // element.selected = false;
+  // setState(
+  // () {
+  // TabBarList[index].selected = true;
+  // this.isActive = TabBarList[index].selected;
+  // },
+  // );
+  // pageController.animateToPage(
+  // index,
+  // curve: Curves.easeIn,
+  // duration: Duration(microseconds: 175),
+  // );
+  // },
+  // );
+  // },
+  // child: Container(
+  // height: size.height * .05,
+  // width: size.width * .17,
+  // child: Column(
+  // mainAxisAlignment: MainAxisAlignment.center,
+  // children: [
+  // Image.asset(
+  // TabBarList[index].image,
+  // width: size.width * .06,
+  // color: Colors.black,
+  // ),
+  // SizedBox(
+  // height: size.height * .005,
+  // ),
+  // AutoSizeText(
+  // TabBarList[index].title,
+  // maxLines: 1,
+  // maxFontSize: 22,
+  // minFontSize: 10,
+  // textAlign: TextAlign.center,
+  // style: TextStyle(
+  // color: Colors.black, fontSize: 12),
+  // ),
+  // ],
+  // ),
+  // ),
+  // ),
+  // (TabBarList[index].selected)
+  // ? Container(
+  // // margin: EdgeInsets.only(left: this.size.width * .01),
+  // height: size.height * .002,
+  // width: this.size.width * .2,
+  // decoration: BoxDecoration(
+  // color: Colors.black,
+  // borderRadius: BorderRadius.circular(20),
+  // ),
+  // )
+  //     : Container(),
+  // ],
+  // ),
+  // );
+  // },
+  // ),
+  // ),
   _buildNavBar() {
     return CurvedNavigationBar(
       key: _bottomNavigationKey,

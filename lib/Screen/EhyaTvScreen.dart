@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:animate_icons/animate_icons.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/loading.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
 import 'package:ehyasalamat/models/MediaModel.dart';
+import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -35,7 +37,6 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
   int _current = 0;
   bool isActive = false;
   bool grid = false;
-  ScrollController scrollController = ScrollController();
   CarouselController buttonCarouselController = CarouselController();
   TextEditingController searchTextEditingController = TextEditingController();
 
@@ -45,23 +46,18 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
         "assets/images/drravazadeh.png",
       ];
 
-  // List get imgList => this.listOfVideos.map((e) => e.);
-
-  int specialId = 15646;
-  int mainId = 15647;
   AnimateIconController c1;
 
   bool isLoading = true;
 
   int page = 1;
 
-  List<MediaModel> listOfVideos = [];
   FRefreshController controller = FRefreshController();
 
   @override
   void initState() {
     c1 = AnimateIconController();
-    this.getPosts();
+    // this.getPosts();
     super.initState();
   }
 
@@ -95,9 +91,6 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
   }
 
   _buildCategoriesItem() {
-    if (this.isLoading) {
-      return LoadingDialog();
-    }
     return SingleChildScrollView(
       child: AnimationLimiter(
         child: Stack(
@@ -429,32 +422,17 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
 
   _buildListITem() {
     return Expanded(
-      child: FRefresh(
-        controller: controller,
-        footerHeight: this.size.height / 8,
-        child: ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: this.listOfVideos.length,
-          itemBuilder: itemBuilder,
-        ),
-        footer: Container(
-          height: this.size.height / 8,
-          child: LoadingDialog(),
-        ),
-        onLoad: () async {
-          this.setState(() {
-            this.page++;
-          });
-          await this.getPosts();
-          controller.finishRefresh();
-        },
+      child: ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: Get.find<PostController>().tvPostList.length,
+        itemBuilder: itemBuilder,
       ),
     );
   }
 
   Widget itemBuilder(BuildContext context, int index) {
-    MediaModel post = this.listOfVideos[index];
+    Result post = Get.find<PostController>().tvPostList[index];
 
     if (searchTextEditingController.text.isEmpty) {
       return GestureDetector(
@@ -500,7 +478,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
                       child: AutoSizeText(
-                        post.title.rendered,
+                        post.title,
                         maxLines: 2,
                         maxFontSize: 22,
                         minFontSize: 12,
@@ -522,7 +500,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
                       child: Html(
-                        data: post.caption.rendered,
+                        data: post.shortDescription,
                       ),
                     ),
                   ),
@@ -538,7 +516,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                             width: size.width * .01,
                           ),
                           AutoSizeText(
-                            "1400/05/23",
+                            post.datePublished,
                             maxLines: 4,
                             maxFontSize: 22,
                             minFontSize: 6,
@@ -594,10 +572,10 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
           ),
         ),
       );
-    } else if (post.title.rendered
+    } else if (post.title
             .toLowerCase()
             .contains(searchTextEditingController.text) ||
-        post.title.rendered
+        post.title
             .toLowerCase()
             .contains(searchTextEditingController.text)) {
       return GestureDetector(
@@ -643,7 +621,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
                       child: AutoSizeText(
-                        post.title.rendered,
+                        post.title,
                         maxLines: 2,
                         maxFontSize: 22,
                         minFontSize: 12,
@@ -665,7 +643,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
                       child: Html(
-                        data: post.caption.rendered,
+                        data: post.shortDescription,
                       ),
                     ),
                   ),
@@ -681,7 +659,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                             width: size.width * .01,
                           ),
                           AutoSizeText(
-                            "1400/05/23",
+                            post.datePublished,
                             maxLines: 4,
                             maxFontSize: 22,
                             minFontSize: 6,
@@ -745,7 +723,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
   _buildGridITem() {
     return Expanded(
       child: GridView.builder(
-        itemCount: this.listOfVideos.length,
+        itemCount: Get.find<PostController>().tvPostList.length,
         physics: BouncingScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
@@ -759,7 +737,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
   }
 
   Widget itemGridBuilder(BuildContext context, int index) {
-    MediaModel post = this.listOfVideos[index];
+    Result post = Get.find<PostController>().tvPostList[index];
     if (searchTextEditingController.text.isEmpty) {
       return GestureDetector(
         onTap: () {
@@ -799,7 +777,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
               Flexible(
                 flex: 1,
                 child: AutoSizeText(
-                  post.title.rendered,
+                  post.title,
                   maxLines: 2,
                   maxFontSize: 22,
                   minFontSize: 12,
@@ -852,7 +830,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                         width: size.width * .02,
                       ),
                       AutoSizeText(
-                        Jalali.fromDateTime(post.date).jDate(),
+                        post.datePublished,
                         maxLines: 4,
                         maxFontSize: 22,
                         minFontSize: 6,
@@ -879,10 +857,10 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
           ),
         ),
       );
-    } else if (post.title.rendered
+    } else if (post.title
             .toLowerCase()
             .contains(searchTextEditingController.text) ||
-        post.title.rendered
+        post.title
             .toLowerCase()
             .contains(searchTextEditingController.text)) {
       return GestureDetector(
@@ -923,7 +901,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
               Flexible(
                 flex: 1,
                 child: AutoSizeText(
-                  post.title.rendered,
+                  post.title,
                   maxLines: 2,
                   maxFontSize: 22,
                   minFontSize: 12,
@@ -976,7 +954,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                         width: size.width * .02,
                       ),
                       AutoSizeText(
-                        Jalali.fromDateTime(post.date).jDate(),
+                        post.datePublished,
                         maxLines: 4,
                         maxFontSize: 22,
                         minFontSize: 6,
@@ -1035,23 +1013,23 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     );
   }
 
-  void getPosts() async {
-    this.setState(() {
-      this.isLoading = page == 1;
-    });
-    ApiResult result = await RequestHelper.search(
-      '',
-      'media',
-      'video',
-      this.page,
-      this.mainId,
-    );
-
-    this.setState(() {
-      this
-          .listOfVideos
-          .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
-      this.isLoading = false;
-    });
-  }
+  // void getPosts() async {
+  //   this.setState(() {
+  //     this.isLoading = page == 1;
+  //   });
+  //   ApiResult result = await RequestHelper.search(
+  //     '',
+  //     'media',
+  //     'video',
+  //     this.page,
+  //     this.mainId,
+  //   );
+  //
+  //   this.setState(() {
+  //     this
+  //         .listOfVideos
+  //         .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
+  //     this.isLoading = false;
+  //   });
+  // }
 }

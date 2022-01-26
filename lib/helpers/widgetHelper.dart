@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ehyasalamat/Screen/LoginScreen.dart';
 import 'package:ehyasalamat/Screen/NotificationScreen.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
+import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/NavHelper.dart';
 import 'package:ehyasalamat/models/DrawerModel.dart';
 import 'package:ehyasalamat/widgets/SearchModalWidget.dart';
@@ -180,7 +181,9 @@ class WidgetHelper {
                           Align(
                             alignment: Alignment.topCenter,
                             child: AutoSizeText(
-                              getProfileBlocInstance.profile.firstName + " " + getProfileBlocInstance.profile.lastName,
+                              getProfileBlocInstance.profile.firstName +
+                                  " " +
+                                  getProfileBlocInstance.profile.lastName,
                               maxLines: 1,
                               maxFontSize: 28,
                               minFontSize: 12,
@@ -213,7 +216,9 @@ class WidgetHelper {
                             ),
                             child: Center(
                               child: AutoSizeText(
-                                "امتیاز: " + getProfileBlocInstance.profile.points.toString(),
+                                "امتیاز: " +
+                                    getProfileBlocInstance.profile.points
+                                        .toString(),
                                 maxLines: 1,
                                 maxFontSize: 28,
                                 minFontSize: 12,
@@ -500,8 +505,6 @@ class WidgetHelper {
     );
   }
 
-
-
   static Widget ItemContainer({
     Size size,
     Color gColor1,
@@ -710,16 +713,13 @@ class WidgetHelper {
                 margin: EdgeInsets.symmetric(horizontal: size.width * .03),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: image.length > 10 && !image.startsWith('assets')
+                  child: Get.find<PostController>().loading.value == true
                       ? FadeInImage.assetNetwork(
-                          placeholder: 'assets/images/chaghi-laghari.png',
+                          placeholder: "assets/anim/loading.gif",
                           image: image,
                           fit: BoxFit.cover,
                         )
-                      : Image.asset(
-                          image,
-                          fit: BoxFit.cover,
-                        ),
+                      : Image.asset("assets/anim/loading.gif"),
                 ),
               ),
             ),

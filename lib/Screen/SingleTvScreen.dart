@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:chewie/chewie.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
-import 'package:ehyasalamat/models/MediaModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -9,7 +8,7 @@ import 'package:simple_tags/simple_tags.dart';
 import 'package:video_player/video_player.dart';
 
 class SingleTvScreen extends StatefulWidget {
-  final MediaModel post;
+  final Result post;
   const SingleTvScreen({
     Key key,
     this.post,
@@ -30,7 +29,7 @@ class _SingleTvScreenState extends State<SingleTvScreen> {
     super.initState();
     // Wrapper on top of the videoPlayerController
     _chewieController = ChewieController(
-      videoPlayerController: VideoPlayerController.network(widget.post.sourceUrl) ,
+      videoPlayerController: VideoPlayerController.network(widget.post.linkTv) ,
       aspectRatio: 15 / 8,
       // Prepare the video to be played and display the first frame
       autoInitialize: true,
@@ -269,7 +268,7 @@ class _SingleTvScreenState extends State<SingleTvScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: size.width * .1),
             child: AutoSizeText(
-              widget.post.title.rendered,
+              widget.post.title,
               maxLines: 2,
               maxFontSize: 22,
               minFontSize: 10,

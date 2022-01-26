@@ -63,7 +63,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
   @override
   void initState() {
     c1 = AnimateIconController();
-    this.getPosts();
     super.initState();
   }
 
@@ -486,7 +485,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
           this.setState(() {
             this.page++;
           });
-          await this.getPosts();
+          // await this.getPosts();
           controller.finishRefresh();
         },
       ),
@@ -1101,24 +1100,24 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
       maxLength: 11,
     );
   }
-
-  void getPosts() async {
-    this.setState(() {
-      this.isLoading = page == 1;
-    });
-    ApiResult result = await RequestHelper.search(
-      '',
-      'media',
-      'audio',
-      this.page,
-      this.mainId,
-    );
-
-    this.setState(() {
-      this
-          .listOfAudios
-          .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
-      this.isLoading = false;
-    });
-  }
+  //
+  // void getPosts() async {
+  //   this.setState(() {
+  //     this.isLoading = page == 1;
+  //   });
+  //   ApiResult result = await RequestHelper.search(
+  //     '',
+  //     'media',
+  //     'audio',
+  //     this.page,
+  //     this.mainId,
+  //   );
+  //
+  //   this.setState(() {
+  //     this
+  //         .listOfAudios
+  //         .addAll(MediaModel.listFromJson(jsonDecode(result.data)));
+  //     this.isLoading = false;
+  //   });
+  // }
 }

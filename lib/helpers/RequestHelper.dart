@@ -8,6 +8,7 @@ enum WebControllers {
   auth,
   ticket,
   support,
+  home,
 }
 enum WebMethods {
   init,
@@ -25,6 +26,7 @@ enum WebMethods {
   retreive_support_ticket,
   create_support_answer,
   referral,
+  category_list,
 }
 
 class RequestHelper {
@@ -203,6 +205,18 @@ class RequestHelper {
     );
   }
 
+  static Future<ApiResult> getAllCategories({String token}) async {
+    return await RequestHelper._makeRequestGet(
+        webController: WebControllers.home,
+        webMethod: WebMethods.category_list,
+        header: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer ${token}"
+        }).timeout(
+      Duration(seconds: 50),
+    );
+  }
+
   static Future<ApiResult> getSection() async {
     return await RequestHelper._makeRequestGet(
       webController: WebControllers.ticket,
@@ -340,248 +354,6 @@ class RequestHelper {
     );
   }
 
-  static Future<ApiResult> search(
-    String query,
-    String type, [
-    String mediaType = '',
-    int page = 1,
-    int categoryId = 0,
-  ]) async {
-    String url =
-        "https://ravazadeh.com/wp-json/wp/v2/$type?_embed=trueper_page=1&search=$query&page=$page";
-    if (mediaType.isNotEmpty) {
-      url = url + '&media_type=' + mediaType;
-    }
-    if (categoryId > 0) {
-      url = url + '&categories=' + categoryId.toString();
-    }
-    print(url);
-    http.Response response = await http.get(Uri.parse(url));
-    ApiResult apiResult = new ApiResult();
-    apiResult.statusCode = response.statusCode;
-    if (response.statusCode == 200) {
-      try {
-        print(response.body);
-        Map data = jsonDecode(response.body);
-        Map data2 = jsonDecode(response.body);
-        apiResult.data2 = data2;
-        apiResult.isDone = true;
-        apiResult.requestedMethod = data['requestedMethod'].toString();
-        apiResult.data = data['data'];
-      } catch (e) {
-        apiResult.isDone = true;
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-
-        apiResult.requestedMethod = 'search';
-        apiResult.data = response.body;
-      }
-    } else {
-      apiResult.isDone = true;
-    }
-    print("\nRequest url: $url\nResponse: {"
-        "status: ${response.statusCode}\n"
-        "isDone: ${apiResult.isDone}\n"
-        "data: ${apiResult.data}"
-        "}");
-    return apiResult;
-  }
-
-  static Future<ApiResult> posts([
-    int page = 1,
-    int id = 0,
-  ]) async {
-    String url =
-        "https://ravazadeh.com/wp-json/wp/v2/posts?_embed=trueper_page=1&page=$page&categories=$id";
-    print(url);
-    http.Response response = await http.get(Uri.parse(url));
-    ApiResult apiResult = new ApiResult();
-    apiResult.statusCode = response.statusCode;
-    if (response.statusCode == 200) {
-      try {
-        print(response.body);
-        Map data = jsonDecode(response.body);
-        Map data2 = jsonDecode(response.body);
-        apiResult.data2 = data2;
-        apiResult.isDone = true;
-        apiResult.requestedMethod = data['requestedMethod'].toString();
-        apiResult.data = data['data'];
-      } catch (e) {
-        apiResult.isDone = true;
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-
-        apiResult.requestedMethod = 'search';
-        apiResult.data = response.body;
-      }
-    } else {
-      apiResult.isDone = true;
-    }
-    print("\nRequest url: $url\nResponse: {"
-        "status: ${response.statusCode}\n"
-        "isDone: ${apiResult.isDone}\n"
-        "data: ${apiResult.data}"
-        "}");
-    return apiResult;
-  }
-
-  static Future<ApiResult> postsCat({int page, int id}) async {
-    String url =
-        "https://ravazadeh.com/wp-json/wp/v2/posts?_embed=trueper_page=1&page=$page&categories=$id";
-    print(url);
-    http.Response response = await http.get(Uri.parse(url));
-    ApiResult apiResult = new ApiResult();
-    apiResult.statusCode = response.statusCode;
-    if (response.statusCode == 200) {
-      try {
-        print(response.body);
-        Map data = jsonDecode(response.body);
-        Map data2 = jsonDecode(response.body);
-        apiResult.data2 = data2;
-        apiResult.isDone = true;
-        apiResult.requestedMethod = data['requestedMethod'].toString();
-        apiResult.data = data['data'];
-      } catch (e) {
-        apiResult.isDone = true;
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-
-        apiResult.requestedMethod = 'search';
-        apiResult.data = response.body;
-      }
-    } else {
-      apiResult.isDone = true;
-    }
-    print("\nRequest url: $url\nResponse: {"
-        "status: ${response.statusCode}\n"
-        "isDone: ${apiResult.isDone}\n"
-        "data: ${apiResult.data}"
-        "}");
-    return apiResult;
-  }
-
-  static Future<ApiResult> informs({String role , String token}) async {
-    String url = "http://87.107.172.122/api/informs/informs/$role";
-    print(url);
-    http.Response response = await http.get(Uri.parse(url),headers: {
-      'Accept': 'application/json',
-      HttpHeaders.authorizationHeader: "Bearer ${token}"
-    });
-    ApiResult apiResult = new ApiResult();
-    apiResult.statusCode = response.statusCode;
-    if (response.statusCode == 200) {
-      try {
-        print(response.body);
-        Map data = jsonDecode(response.body);
-        apiResult.isDone = data['isDone'] == true;
-        apiResult.requestedMethod = data['requestedMethod'].toString();
-        apiResult.data = data['data'];
-      } catch (e) {
-        apiResult.isDone = false;
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-
-        apiResult.data = response.body;
-      }
-    } else {
-      apiResult.isDone = false;
-    }
-    print("\nRequest url: $url\nResponse: {"
-        "status: ${response.statusCode}\n"
-        "isDone: ${apiResult.isDone}\n"
-        "data: ${apiResult.data}"
-        "}");
-    return apiResult;
-  }
-
-  static Future<ApiResult> lastPosts([
-    int page = 1,
-  ]) async {
-    String url =
-        "https://ravazadeh.com/wp-json/wp/v2/posts?_embed=trueper_page=1&page=$page";
-    print(url);
-    http.Response response = await http.get(Uri.parse(url));
-    ApiResult apiResult = new ApiResult();
-    apiResult.statusCode = response.statusCode;
-    if (response.statusCode == 200) {
-      try {
-        print(response.body);
-        Map data = jsonDecode(response.body);
-        Map data2 = jsonDecode(response.body);
-        apiResult.data2 = data2;
-        apiResult.isDone = true;
-        apiResult.requestedMethod = data['requestedMethod'].toString();
-        apiResult.data = data['data'];
-      } catch (e) {
-        apiResult.isDone = true;
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-
-        apiResult.requestedMethod = 'search';
-        apiResult.data = response.body;
-      }
-    } else {
-      apiResult.isDone = true;
-    }
-    print("\nRequest url: $url\nResponse: {"
-        "status: ${response.statusCode}\n"
-        "isDone: ${apiResult.isDone}\n"
-        "data: ${apiResult.data}"
-        "}");
-    return apiResult;
-  }
-
-  static Future<ApiResult> categoryList() async {
-    String url = "https://ravazadeh.com/wp-json/wp/v2/categories";
-    print(url);
-    http.Response response = await http.get(Uri.parse(url));
-    ApiResult apiResult = new ApiResult();
-    apiResult.statusCode = response.statusCode;
-    if (response.statusCode == 200) {
-      try {
-        print(response.body);
-        Map data = jsonDecode(response.body);
-        Map data2 = jsonDecode(response.body);
-        apiResult.data2 = data2;
-        apiResult.isDone = true;
-        apiResult.requestedMethod = data['requestedMethod'].toString();
-        apiResult.data = data['data'];
-      } catch (e) {
-        apiResult.isDone = true;
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-        print(response.body);
-
-        apiResult.requestedMethod = 'search';
-        apiResult.data = response.body;
-      }
-    } else {
-      apiResult.isDone = true;
-    }
-    print("\nRequest url: $url\nResponse: {"
-        "status: ${response.statusCode}\n"
-        "isDone: ${apiResult.isDone}\n"
-        "data: ${apiResult.data}"
-        "}");
-    return apiResult;
-  }
 
   static Future<ApiResult> getSupportTicketList({String token}) async {
     return await RequestHelper._makeRequestGet(
@@ -642,6 +414,96 @@ class RequestHelper {
       Duration(seconds: 50),
     );
   }
+
+//  **************************************************************************
+//  **************************************************************************
+//  **************************************************************************
+
+
+  static Future<ApiResult> posts({
+    String id = "",
+    String token,
+    String page,
+  }) async {
+    String url = "http://87.107.172.122/api/home/posts_list/$id?$page";
+    print(url);
+    http.Response response = await http.get(Uri.parse(url), headers: {
+      'Accept': 'application/json',
+      HttpHeaders.authorizationHeader: "Bearer ${token}"
+    });
+    ApiResult apiResult = new ApiResult();
+    apiResult.statusCode = response.statusCode;
+    if (response.statusCode == 200) {
+      try {
+        print(response.body);
+        Map data = jsonDecode(response.body);
+        apiResult.isDone = data['isDone'] == true;
+        apiResult.requestedMethod = data['requestedMethod'].toString();
+        apiResult.data = data['data'];
+      } catch (e) {
+        apiResult.isDone = false;
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+
+        apiResult.requestedMethod = 'search';
+        apiResult.data = response.body;
+      }
+    } else {
+      apiResult.isDone = true;
+    }
+    print("\nRequest url: $url\nResponse: {"
+        "status: ${response.statusCode}\n"
+        "isDone: ${apiResult.isDone}\n"
+        "data: ${apiResult.data}"
+        "}");
+    return apiResult;
+  }
+
+  static Future<ApiResult> informs({String role, String token}) async {
+    String url = "http://87.107.172.122/api/informs/informs/$role";
+    print(url);
+    http.Response response = await http.get(Uri.parse(url), headers: {
+      'Accept': 'application/json',
+      HttpHeaders.authorizationHeader: "Bearer ${token}"
+    });
+    ApiResult apiResult = new ApiResult();
+    apiResult.statusCode = response.statusCode;
+    if (response.statusCode == 200) {
+      try {
+        print(response.body);
+        Map data = jsonDecode(response.body);
+        apiResult.isDone = data['isDone'] == true;
+        apiResult.requestedMethod = data['requestedMethod'].toString();
+        apiResult.data = data['data'];
+      } catch (e) {
+        apiResult.isDone = false;
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+
+        apiResult.data = response.body;
+      }
+    } else {
+      apiResult.isDone = false;
+    }
+    print("\nRequest url: $url\nResponse: {"
+        "status: ${response.statusCode}\n"
+        "isDone: ${apiResult.isDone}\n"
+        "data: ${apiResult.data}"
+        "}");
+    return apiResult;
+  }
+
+
+
+
+
+
 }
 
 class ApiResult {
