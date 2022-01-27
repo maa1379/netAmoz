@@ -31,7 +31,6 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
   bool isDeleted = false;
   bool hasSearch = false;
 
-
   final _formKey = GlobalKey<FormState>();
   TextEditingController searchTextEditingController = TextEditingController();
 
@@ -212,8 +211,6 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
           postController.postListS.clear();
           postController.tvPostListS.clear();
           postController.rPostListS.clear();
-
-
         },
         fontSize: 16,
         controller: searchTextEditingController,

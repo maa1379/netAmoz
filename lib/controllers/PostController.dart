@@ -2,7 +2,10 @@ import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/models/CategoryModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
+import 'package:ehyasalamat/models/SinglePostModel.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class PostController extends GetxController {
@@ -20,7 +23,7 @@ class PostController extends GetxController {
   getPost() async {
     RequestHelper.posts(id: "all", token: await PrefHelpers.getToken())
         .then((value) {
-      if (value.isDone){
+      if (value.isDone) {
         allPostList.clear();
         postList.clear();
         rPostList.clear();
@@ -46,7 +49,6 @@ class PostController extends GetxController {
           }
         });
         loading.value = true;
-
       } else {
         loading.value = false;
       }
@@ -95,8 +97,7 @@ class PostController extends GetxController {
     });
   }
 
-
-  get()async{
+  get() async {
     print("**************");
     print(await PrefHelpers.getList());
     print("**************");
@@ -142,5 +143,48 @@ class CategoryController extends GetxController {
   void onInit() {
     getAllCategories();
     super.onInit();
+  }
+}
+
+class CommentController extends GetxController {
+  RxBool isSend = false.obs;
+  RxBool isReply = false.obs;
+  RxList<Comment> commentList = <Comment>[].obs;
+  TextEditingController textController = TextEditingController();
+  RxString cmReply = "".obs;
+  RxInt cmReplyId = 0.obs;
+  RxString postId = "".obs;
+
+  CreateComment({String text, String parent, String postId}) async {
+    RequestHelper.createComment(
+            token: await PrefHelpers.getToken(),
+            text: text,
+            parent: parent,
+            postId: postId)
+        .then(
+      (value) {
+        if (value.isDone) {
+          GetSinglePost(postID: postId);
+          EasyLoading.dismiss();
+          this.isSend.value = true;
+        } else {
+          this.isSend.value = false;
+        }
+      },
+    );
+  }
+
+  SinglePostModel singlePost;
+
+  GetSinglePost({String postID}) async {
+    RequestHelper.GetSinglePost(token: await PrefHelpers.getToken(), id: postID)
+        .then((value) {
+      if (value.isDone) {
+        singlePost = SinglePostModel.fromJson(value.data);
+        commentList.addAll(singlePost.comments);
+      } else {
+        print("no");
+      }
+    });
   }
 }
