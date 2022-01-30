@@ -17,6 +17,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import 'AllPostScreen.dart';
 import 'SinglePostScreen.dart';
 
 class CategoryTapbarScreen extends StatefulWidget {
@@ -230,13 +231,18 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                 ),
                 Row(
                   children: [
-                    AutoSizeText(
-                      "مشاهده بلاگ همه مطالب",
-                      maxLines: 1,
-                      maxFontSize: 22,
-                      minFontSize: 10,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xff7366FF), fontSize: 12),
+                    GestureDetector(
+                      onTap: (){
+                        Get.to(AllPostScreen());
+                      },
+                      child: AutoSizeText(
+                        "مشاهده بلاگ همه مطالب",
+                        maxLines: 1,
+                        maxFontSize: 22,
+                        minFontSize: 10,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xff7366FF), fontSize: 12),
+                      ),
                     ),
                     SizedBox(
                       width: size.width * .01,

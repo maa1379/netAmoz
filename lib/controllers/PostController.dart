@@ -17,6 +17,8 @@ class PostController extends GetxController {
   RxBool loading = false.obs;
   RxBool loadingSearch = false.obs;
   RxBool hasSearch = false.obs;
+  RxInt tvPage = 1.obs;
+  RxInt radioPage = 1.obs;
 
   ScrollController postController = ScrollController();
 
@@ -103,6 +105,49 @@ class PostController extends GetxController {
     print("**************");
   }
 
+  getTVPost() async {
+    RequestHelper.posts(
+            id: "all",
+            page: tvPage.toString(),
+            token: await PrefHelpers.getToken())
+        .then((value) {
+      if (value.isDone) {
+        for (var i in value.data['results']) {
+          allPostList.add(Result.fromJson(i));
+        }
+
+        allPostList.forEach((element) {
+          if (!element.radioEhya && element.ehyaTv && element.published ||
+              element.radioEhya && element.ehyaTv && element.published) {
+            tvPostList.add(element);
+          }
+        });
+      }
+    });
+  }
+
+
+  getRadioPost() async {
+    RequestHelper.posts(
+        id: "all",
+        page: radioPage.toString(),
+        token: await PrefHelpers.getToken())
+        .then((value) {
+      if (value.isDone) {
+        for (var i in value.data['results']) {
+          allPostList.add(Result.fromJson(i));
+        }
+
+        allPostList.forEach((element) {
+          if (element.radioEhya && !element.ehyaTv && element.published ||
+              element.radioEhya && element.ehyaTv && element.published) {
+            rPostList.add(element);
+          }
+        });
+      }
+    });
+  }
+
   //
   // @override
   // void dispose() {
@@ -186,5 +231,41 @@ class CommentController extends GetxController {
         print("no");
       }
     });
+  }
+}
+
+class AllPostController extends GetxController {
+  RxList<Result> allPostList = <Result>[].obs;
+  RxList<Result> postList = <Result>[].obs;
+  RxBool loading = false.obs;
+  RxInt page = 1.obs;
+
+  getPost() async {
+    RequestHelper.posts(
+            id: "all",
+            page: page.toString(),
+            token: await PrefHelpers.getToken())
+        .then((value) {
+      if (value.isDone) {
+        for (var i in value.data['results']) {
+          allPostList.add(Result.fromJson(i));
+        }
+
+        allPostList.forEach((element) {
+          if (!element.ehyaTv && !element.radioEhya && element.published) {
+            postList.add(element);
+          }
+        });
+        loading.value = true;
+      } else {
+        loading.value = false;
+      }
+    });
+  }
+
+  @override
+  void onInit() {
+    getPost();
+    super.onInit();
   }
 }

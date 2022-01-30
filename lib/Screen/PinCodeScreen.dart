@@ -1,15 +1,14 @@
 import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/material.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
-import 'package:ehyasalamat/helpers/NavHelper.dart';
+import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/ViewHelpers.dart';
-import 'package:ehyasalamat/helpers/prefHelper.dart';
 import 'package:ehyasalamat/models/ProfileModel.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
@@ -35,6 +34,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       borderRadius: BorderRadius.circular(15.0),
     );
   }
+
   StreamController<ErrorAnimationType> errorController;
   String currentText = "";
   final RoundedLoadingButtonController _btnController1 =
@@ -45,7 +45,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
 
   void _doSomething() async {
     RequestHelper.LoginOtp(mobile: widget.mobile, code: pinCodeController.text)
-        .then((value) async{
+        .then((value) async {
       print(value.data);
       if (value.isDone) {
         print("ok");
@@ -58,20 +58,18 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
     });
   }
 
-
-  getProfileByToken()async{
-    RequestHelper.getProfile(token: await PrefHelpers.getToken()).then((value){
+  getProfileByToken() async {
+    RequestHelper.getProfile(token: await PrefHelpers.getToken()).then((value) {
       print(value.data);
-      if(value.isDone){
-        getProfileBlocInstance
-            .getProfile(ProfileModel.fromJson(value.data));
+      if (value.isDone) {
+        getProfileBlocInstance.getProfile(ProfileModel.fromJson(value.data));
+        Get.put(PostController());
         Get.to(HomeScreen());
-      }else{
+      } else {
         print("faild");
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -113,9 +111,6 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       ),
     );
   }
-
-
-
 
   Widget _buildPinPut() {
     return Align(
@@ -172,7 +167,6 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       ),
     );
   }
-
 
   _submitBtn() {
     return Padding(

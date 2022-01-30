@@ -1,13 +1,8 @@
-import 'dart:convert';
-
 import 'package:animate_icons/animate_icons.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ehyasalamat/controllers/PostController.dart';
-import 'package:ehyasalamat/helpers/RequestHelper.dart';
-import 'package:ehyasalamat/helpers/loading.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
-import 'package:ehyasalamat/models/MediaModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +11,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:frefresh/frefresh.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -33,26 +29,51 @@ class EhyaTvScreen extends StatefulWidget {
 }
 
 class _EhyaTvScreenState extends State<EhyaTvScreen> {
+
+  PostController postController = Get.find<PostController>();
+
   Size size;
   int _current = 0;
   bool isActive = false;
   bool grid = false;
   CarouselController buttonCarouselController = CarouselController();
   TextEditingController searchTextEditingController = TextEditingController();
-
+  // int page = 1;
   List get imgList => [
         "assets/images/drravazadeh.png",
         "assets/images/drravazadeh.png",
         "assets/images/drravazadeh.png",
       ];
 
+
+
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    postController.getTVPost();
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    postController.tvPage + 1;
+    postController.getTVPost();
+    // if (mounted) setState(() {});
+    _refreshController.loadComplete();
+  }
+
+
+
+
+
+
+
+
   AnimateIconController c1;
 
   bool isLoading = true;
 
-  int page = 1;
-
-  FRefreshController controller = FRefreshController();
+  // int page = 1;
 
   @override
   void initState() {
@@ -85,7 +106,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
       body: Container(
         height: size.height,
         width: size.width,
-        child: _buildCategoriesItem(),
+        child: Obx(()=>_buildCategoriesItem(),)
       ),
     );
   }
@@ -720,6 +741,36 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
 
   _buildGridITem() {
     return Expanded(
+        child: SmartRefresher(
+      enablePullDown: true,
+      enablePullUp: true,
+      header: WaterDropHeader(),
+      footer: CustomFooter(
+        builder: (BuildContext context, LoadStatus mode) {
+          Widget body;
+          if (mode == LoadStatus.idle) {
+            body = Text("بکشید");
+          } else if (mode == LoadStatus.loading) {
+            body = CupertinoActivityIndicator();
+          } else if (mode == LoadStatus.failed) {
+            body = Text("درحال دریافت");
+          } else if (mode == LoadStatus.canLoading) {
+            body = Text("درحال دریافت");
+          } else {
+            body = Text("اطللاعاتی دریافت نشد");
+          }
+          return Container(
+            alignment: Alignment.center,
+            height: Get.height * .15,
+            width: Get.width * .2,
+            child: Center(child: body),
+          );
+        },
+      ),
+      controller: _refreshController,
+      onRefresh: _onRefresh,
+      scrollDirection: Axis.vertical,
+      onLoading: _onLoading,
       child: GridView.builder(
         itemCount: Get.find<PostController>().tvPostList.length,
         physics: BouncingScrollPhysics(),
@@ -731,7 +782,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
         ),
         itemBuilder: itemGridBuilder,
       ),
-    );
+    ));
   }
 
   Widget itemGridBuilder(BuildContext context, int index) {
