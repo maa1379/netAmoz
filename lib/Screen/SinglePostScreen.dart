@@ -304,7 +304,7 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.of(context).pop();
+                Get.back();
               },
               child: Container(
                 height: size.height * .04,
@@ -365,7 +365,8 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
                         alignment: Alignment.topLeft,
                         child: GestureDetector(
                             onTap: () {
-                              Navigator.of(context).pop();
+                              this.commentController.isReply.value = false;
+                              Get.close(1);
                             },
                             child: Icon(
                               Icons.close,
@@ -380,18 +381,30 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
                       maxFontSize: 24,
                       minFontSize: 6,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xff7366FF), fontSize: 18),
+                      style: TextStyle(
+                        color: Color(
+                          0xff7366FF,
+                        ),
+                        fontSize: 18,
+                      ),
                     ),
                     Padding(
-                        padding: EdgeInsets.all(Get.width * .03),
-                        child: Icon(
-                          Icons.comment_outlined,
-                          color: Color(0xff7366FF),
-                          size: Get.width * .1,
-                        )),
+                      padding: EdgeInsets.all(Get.width * .03),
+                      child: Icon(
+                        Icons.comment_outlined,
+                        color: Color(0xff7366FF),
+                        size: Get.width * .1,
+                      ),
+                    ),
                   ],
                 ),
-                _buildCommentList(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: _buildCommentList(
+                      this.commentController.commentList.value,
+                    ),
+                  ),
+                ),
                 (commentController.isReply.value == false)
                     ? Container()
                     : Row(
@@ -399,21 +412,29 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           IconButton(
-                              onPressed: () {
-                                commentController.isReply.value = false;
-                              },
-                              icon: Icon(Icons.clear)),
+                            onPressed: () {
+                              commentController.textController.clear();
+                              ;
+                              commentController.isReply.value = false;
+                            },
+                            icon: Icon(Icons.clear),
+                          ),
                           Container(
                             // margin: EdgeInsets.symmetric(horizontal: Get.width * .05),
                             height: Get.height * .05,
                             width: Get.width * .7,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.black, width: 0.5)),
+                              color: Colors.white,
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 0.5,
+                              ),
+                            ),
                             child: AutoSizeText(
-                              commentController.cmReply.value,
+                              commentController.replyComment is Comment
+                                  ? commentController.replyComment.text
+                                  : '',
                               maxLines: 1,
                               maxFontSize: 24,
                               minFontSize: 16,
@@ -453,19 +474,19 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
             keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
               prefixIcon: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   EasyLoading.show(
-                      dismissOnTap: false,
-                      indicator: CircularProgressIndicator());
+                    dismissOnTap: true,
+                    indicator: CircularProgressIndicator(),
+                  );
                   commentController.isReply.value = false;
-                  commentController.postId =
-                      RxString(commentController.postId.value.toString());
-                  commentController.CreateComment(
-                      text: commentController.textController.text,
-                      parent: (commentController.cmReplyId.value == 0)
-                          ? ""
-                          : commentController.cmReplyId.value.toString(),
-                      postId: commentController.postId.value.toString());
+                  await commentController.CreateComment();
+                  commentController.commentList.clear();
+                  await commentController.GetSinglePost(
+                    postID: commentController.singlePost.id.toString(),
+                  );
+                  this.commentController.textController.clear();
+                  this.setState(() {});
                 },
                 child: Container(
                   margin: EdgeInsets.all(Get.width * .01),
@@ -521,54 +542,128 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
     );
   }
 
-  _buildCommentList() {
-    return Expanded(
-      child: ListView.builder(
-        physics: BouncingScrollPhysics(),
-        itemCount: commentController.commentList.length,
-        itemBuilder: (BuildContext context, int index) {
-          Comment comments = commentController.commentList[index];
-          return Row(
-            children: [
-              IconButton(
-                  onPressed: () {
-                    commentController.cmReply = RxString(comments.text);
-                    commentController.cmReplyId = RxInt(comments.id);
-                    commentController.isReply.value = true;
-                  },
-                  icon: Icon(Icons.replay)),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: Get.width * .05, vertical: Get.height * .015),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: Get.height * .5,
-                    minHeight: Get.height * .05,
-                    maxWidth: Get.width * .65,
-                    minWidth: Get.width * .65,
-                  ),
-                  child: Material(
-                    borderRadius: BorderRadius.circular(10),
-                    elevation: 5,
-                    color: Colors.white,
-                    child: Padding(
-                      padding: EdgeInsets.all(Get.width * .02),
-                      child: AutoSizeText(
-                        comments.text,
-                        maxLines: null,
-                        maxFontSize: 24,
-                        minFontSize: 6,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(color: Colors.black, fontSize: 18),
+  _buildCommentList(List<Comment> list) {
+    return Column(
+      children: list
+          .map(
+            (e) => this.buildComment(e, list),
+          )
+          .toList(),
+    );
+    return ListView.builder(
+      physics: BouncingScrollPhysics(),
+      itemCount: list.length,
+      itemBuilder: (BuildContext context, int index) {
+        Comment comment = list[index];
+        return this.buildComment(comment, list);
+      },
+    );
+  }
+
+  Widget buildComment(Comment comment, List<Comment> list) {
+    return Column(
+      children: [
+        AnimationConfiguration.staggeredList(
+          position: list.indexOf(comment),
+          duration: Duration(milliseconds: 100),
+          child: FadeInAnimation(
+            child: Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: 8.0,
+              ),
+              height: Get.height / 10,
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      commentController.isReply.value = false;
+
+                      commentController.replyComment = comment;
+                      this.setState(() {});
+                      this.commentController.refresh();
+                      commentController.isReply.value = true;
+                    },
+                    child: Container(
+                      child: Icon(
+                        Icons.replay,
+                        color: Colors.grey.shade700,
                       ),
                     ),
                   ),
-                ),
+                  if (comment.children.length > 0) ...[
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        comment.showComments.value =
+                            !comment.showComments.value;
+                      },
+                      child: Container(
+                        child: Icon(
+                          Icons.comment_outlined,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                  SizedBox(
+                    width: 16.0,
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(
+                        vertical: 12.0,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(Get.width * .02),
+                        child: AutoSizeText(
+                          comment.text,
+                          maxLines: null,
+                          maxFontSize: 24,
+                          minFontSize: 6,
+                          textAlign: TextAlign.end,
+                          style: TextStyle(color: Colors.black, fontSize: 18),
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 3.0,
+                            blurRadius: 8.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ),
+        ),
+        Obx(
+          () => AnimatedSwitcher(
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: child,
+              );
+            },
+            duration: Duration(milliseconds: 100),
+            child: comment.showComments.isTrue
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: this._buildCommentList(comment.children),
+                  )
+                : Material(
+                    child: Container(),
+                  ),
+          ),
+        ),
+      ],
     );
   }
 }

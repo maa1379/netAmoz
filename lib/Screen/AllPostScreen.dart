@@ -7,7 +7,6 @@ import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'SinglePostScreen.dart';
@@ -150,17 +149,7 @@ class AllPostScreen extends StatelessWidget {
               size: Get.size,
               image: post.image,
               func: () {
-                Navigator.push(
-                  context,
-                  PageTransition(
-                    type: PageTransitionType.fade,
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeInOutCubic,
-                    child: SinglePostScreen(
-                        // post: post,
-                        ),
-                  ),
-                );
+                Get.to(() => SinglePostScreen());
               },
             );
           },

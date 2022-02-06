@@ -126,12 +126,11 @@ class PostController extends GetxController {
     });
   }
 
-
   getRadioPost() async {
     RequestHelper.posts(
-        id: "all",
-        page: radioPage.toString(),
-        token: await PrefHelpers.getToken())
+            id: "all",
+            page: radioPage.toString(),
+            token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone) {
         for (var i in value.data['results']) {
@@ -196,21 +195,21 @@ class CommentController extends GetxController {
   RxBool isReply = false.obs;
   RxList<Comment> commentList = <Comment>[].obs;
   TextEditingController textController = TextEditingController();
-  RxString cmReply = "".obs;
-  RxInt cmReplyId = 0.obs;
-  RxString postId = "".obs;
 
-  CreateComment({String text, String parent, String postId}) async {
+  Comment replyComment;
+
+  CreateComment() async {
     RequestHelper.createComment(
-            token: await PrefHelpers.getToken(),
-            text: text,
-            parent: parent,
-            postId: postId)
-        .then(
+      token: await PrefHelpers.getToken(),
+      text: this.textController.text,
+      parent:
+          this.replyComment is Comment ? this.replyComment.id.toString() : "",
+      postId: singlePost.id.toString(),
+    ).then(
       (value) {
         if (value.isDone) {
-          GetSinglePost(postID: postId);
           EasyLoading.dismiss();
+
           this.isSend.value = true;
         } else {
           this.isSend.value = false;
@@ -226,6 +225,7 @@ class CommentController extends GetxController {
         .then((value) {
       if (value.isDone) {
         singlePost = SinglePostModel.fromJson(value.data);
+
         commentList.addAll(singlePost.comments);
       } else {
         print("no");

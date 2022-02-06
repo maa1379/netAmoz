@@ -97,7 +97,10 @@ class RequestHelper {
         await http.post(Uri.parse(url), headers: header, body: body);
     ApiResult apiResult = new ApiResult();
     apiResult.statusCode = response.statusCode;
+    print(response.body);
+
     if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
         response.statusCode == 400 ||
         response.statusCode == 201) {
       try {
@@ -355,8 +358,12 @@ class RequestHelper {
     );
   }
 
-
-  static Future<ApiResult> createComment({String token, String postId,String text,String parent}) async {
+  static Future<ApiResult> createComment({
+    String token,
+    String postId,
+    String text,
+    String parent,
+  }) async {
     return await RequestHelper._makeRequestPost(
         webController: WebControllers.home,
         webMethod: WebMethods.create_comment,
@@ -372,8 +379,6 @@ class RequestHelper {
       Duration(seconds: 50),
     );
   }
-
-
 
   static Future<ApiResult> getSupportTicketList({String token}) async {
     return await RequestHelper._makeRequestGet(
@@ -439,13 +444,12 @@ class RequestHelper {
 //  **************************************************************************
 //  **************************************************************************
 
-
   static Future<ApiResult> posts({
     String id = "",
     String token,
     String page,
   }) async {
-    String url = "http://87.107.172.122/api/home/posts_list/$id?$page";
+    String url = "http://87.107.172.122/api/home/posts_list/$id?${(page == null)?"":page}";
     print(url);
     http.Response response = await http.get(Uri.parse(url), headers: {
       'Accept': 'application/json',
@@ -481,7 +485,6 @@ class RequestHelper {
         "}");
     return apiResult;
   }
-
 
   static Future<ApiResult> GetSinglePost({
     String id = "",
@@ -524,8 +527,6 @@ class RequestHelper {
     return apiResult;
   }
 
-
-
   static Future<ApiResult> search({
     String token,
     String q,
@@ -567,7 +568,6 @@ class RequestHelper {
     return apiResult;
   }
 
-
   static Future<ApiResult> informs({String role, String token}) async {
     String url = "http://87.107.172.122/api/informs/informs/$role";
     print(url);
@@ -604,12 +604,6 @@ class RequestHelper {
         "}");
     return apiResult;
   }
-
-
-
-
-
-
 }
 
 class ApiResult {

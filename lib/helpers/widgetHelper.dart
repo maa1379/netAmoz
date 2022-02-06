@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import 'AlertHelper.dart';
 import 'PrefHelpers.dart';
 
 class WidgetHelper {
@@ -418,8 +417,13 @@ class WidgetHelper {
     }
   }
 
-  static Widget appBar(
-      {Size size, GlobalKey<ScaffoldState> key, BuildContext context}) {
+  static Widget appBar({
+    Size size,
+    GlobalKey<ScaffoldState> key,
+    BuildContext context,
+    String title = "حکیم دکتر روازاده",
+    bool innerPage = false,
+  }) {
     return Container(
       height: size.height * .08,
       width: size.width,
@@ -449,12 +453,13 @@ class WidgetHelper {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset(
-                  "assets/images/ehyalogo.png",
-                  width: size.width * .08,
-                ),
+                if (!innerPage)
+                  Image.asset(
+                    "assets/images/ehyalogo.png",
+                    width: size.width * .08,
+                  ),
                 AutoSizeText(
-                  "حکیم دکتر روازاده",
+                  "${title}",
                   maxLines: 1,
                   maxFontSize: 26,
                   minFontSize: 10,
@@ -464,42 +469,58 @@ class WidgetHelper {
               ],
             ),
           ),
-          Container(
-            height: size.height * .05,
-            width: size.width * .3,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  child: Image.asset(
-                    "assets/images/search.png",
-                    width: size.width * .06,
+          if (!innerPage) ...[
+            Container(
+              height: size.height * .05,
+              width: size.width * .3,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    child: Image.asset(
+                      "assets/images/search.png",
+                      width: size.width * .06,
+                    ),
+                    onTap: () {
+                      showMaterialModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        isDismissible: true,
+                        enableDrag: false,
+                        context: Get.context,
+                        builder: (context) {
+                          return SearchModalWidget();
+                        },
+                      );
+                    },
                   ),
-                  onTap: () {
-                    showMaterialModalBottomSheet(
-                      backgroundColor: Colors.transparent,
-                      isDismissible: true,
-                      enableDrag: false,
-                      context: Get.context,
-                      builder: (context) {
-                        return SearchModalWidget();
-                      },
-                    );
-                  },
-                ),
-                GestureDetector(
-                  onTap: () {
-                    NavHelper.push(context, NotificationScreen());
-                  },
-                  child: Image.asset(
-                    "assets/images/alarm.png",
-                    width: size.width * .06,
+                  GestureDetector(
+                    onTap: () {
+                      NavHelper.push(context, NotificationScreen());
+                    },
+                    child: Image.asset(
+                      "assets/images/alarm.png",
+                      width: size.width * .06,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
+          if (innerPage)
+            GestureDetector(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 24.0),
+                child: Icon(
+                  Icons.arrow_back_ios,
+                  textDirection: TextDirection.ltr,
+                  color: Colors.grey,
+                ),
+              ),
+              onTap: () {
+                Get.back();
+              },
+            ),
         ],
       ),
     );
@@ -713,7 +734,8 @@ class WidgetHelper {
                 margin: EdgeInsets.symmetric(horizontal: size.width * .03),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Get.find<PostController>().loading.value == true
+                  child: Get.find<PostController>().loading.value == true &&
+                          image != null
                       ? FadeInImage.assetNetwork(
                           placeholder: "assets/anim/loading.gif",
                           image: image,

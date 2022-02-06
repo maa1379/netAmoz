@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ehyasalamat/Screen/CategoriesScreen.dart';
 import 'package:ehyasalamat/controllers/PostController.dart';
-import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/loading.dart';
+import 'package:ehyasalamat/helpers/widgetHelper.dart';
 import 'package:ehyasalamat/models/CategoryModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,9 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:ehyasalamat/helpers/AlertHelper.dart';
-import 'package:ehyasalamat/helpers/widgetHelper.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -26,8 +23,8 @@ class CategoryTapbarScreen extends StatefulWidget {
 }
 
 class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
-  PostController postController = Get.find<PostController>();
-  CategoryController categoryController = Get.find<CategoryController>();
+  PostController postController = Get.put(PostController());
+  CategoryController categoryController = Get.put(CategoryController());
   bool load = false;
   Size size;
   int _current = 0;
@@ -190,17 +187,22 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
             scrollDirection: Axis.horizontal,
             itemBuilder: (BuildContext context, int index) {
               CategoriesModel cat = categoryController.categoriesList[index];
-              return Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: size.width * .02,
-                  vertical: size.height * .005,
+              return GestureDetector(
+                onTap: () {
+                  Get.to(() => CategoriesScreen(),arguments: [cat,],);
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: size.width * .02,
+                    vertical: size.height * .005,
+                  ),
+                  child: WidgetHelper.ItemContainer(
+                      size: size,
+                      icon: "assets/images/crona.png",
+                      text: cat.name,
+                      gColor1: Colors.red,
+                      gColor2: Colors.blue),
                 ),
-                child: WidgetHelper.ItemContainer(
-                    size: size,
-                    icon: "assets/images/crona.png",
-                    text: cat.name,
-                    gColor1: Colors.red,
-                    gColor2: Colors.blue),
               );
             },
           )),
@@ -232,7 +234,7 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Get.to(AllPostScreen());
                       },
                       child: AutoSizeText(
@@ -241,7 +243,8 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                         maxFontSize: 22,
                         minFontSize: 10,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xff7366FF), fontSize: 12),
+                        style:
+                            TextStyle(color: Color(0xff7366FF), fontSize: 12),
                       ),
                     ),
                     SizedBox(
@@ -258,33 +261,26 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
             height: size.height * .02,
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: postController.postList.length,
-              physics: BouncingScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (BuildContext context, int index) {
-                Result post = postController.postList[index];
-                return WidgetHelper.ItemPostContainer(
-                  text: post.title,
-                  size: size,
-                  image: post.image,
-                  func: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.fade,
-                        duration: Duration(milliseconds: 500),
-                        curve: Curves.easeInOutCubic,
-                        child: SinglePostScreen(
-                          post: post,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            )
-          ),
+              child: ListView.builder(
+            itemCount: postController.postList.length,
+            physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (BuildContext context, int index) {
+              Result post = postController.postList[index];
+              return WidgetHelper.ItemPostContainer(
+                text: post.title,
+                size: size,
+                image: post.image,
+                func: () {
+                  Get.to(
+                    () => SinglePostScreen(
+                      post: post,
+                    ),
+                  );
+                },
+              );
+            },
+          )),
         ],
       ),
     );
@@ -610,16 +606,26 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                     itemBuilder: (BuildContext context, int index) {
                       CategoriesModel cat =
                           categoryController.categoriesList[index];
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: size.width * .005,
-                            vertical: size.height * .005),
-                        child: WidgetHelper.ItemContainer(
-                            size: size,
-                            icon: "assets/images/crona.png",
-                            text: cat.name,
-                            gColor1: Colors.red,
-                            gColor2: Colors.blue),
+                      return GestureDetector(
+                        onTap: () {
+                          Get.to(
+                            () => CategoriesScreen(),
+                            arguments: [
+                              cat,
+                            ],
+                          );
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: size.width * .005,
+                              vertical: size.height * .005),
+                          child: WidgetHelper.ItemContainer(
+                              size: size,
+                              icon: "assets/images/crona.png",
+                              text: cat.name,
+                              gColor1: Colors.red,
+                              gColor2: Colors.blue),
+                        ),
                       );
                     },
                   ),
@@ -635,8 +641,6 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
     );
   }
 }
-
-
 
 // SmartRefresher(
 // enablePullDown: true,
