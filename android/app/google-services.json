@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "477878933075",
+    "firebase_url": "https://ehya-app-default-rtdb.firebaseio.com",
+    "project_id": "ehya-app",
+    "storage_bucket": "ehya-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:477878933075:android:b69def041a738ccf7d18a6",
+        "android_client_info": {
+          "package_name": "com.example.ehyasalamat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "477878933075-o0lcbhkedng7aflb59qjg50apqit90jb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_po41V5EjjXiaFPc2bqHexGylPYyga6o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "477878933075-o0lcbhkedng7aflb59qjg50apqit90jb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "477878933075-5liq3mmrjuj1qfspk7uggfs24mj1m2ah.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ehyasalamat.Drravazadeh"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

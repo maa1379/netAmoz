@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
@@ -7,6 +8,7 @@ import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/ViewHelpers.dart';
 import 'package:ehyasalamat/models/ProfileModel.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -51,6 +53,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
         print("ok");
         PrefHelpers.setToken(value.data['access'].toString());
         await getProfileByToken();
+        getRegistrationId();
       } else {
         print("no");
         ViewHelper.showErrorDialog(context, "ورود با خطا مواجه شد");
@@ -70,6 +73,22 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       }
     });
   }
+
+
+  getRegistrationId()async{
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    String token = await messaging.getToken();
+    log(token ?? '');
+    RequestHelper.registrationId(token: await PrefHelpers.getToken(),registration_id: token).then((value){
+      if(value.isDone){
+        print("token ok");
+
+      }else{
+        print("token not ok");
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {

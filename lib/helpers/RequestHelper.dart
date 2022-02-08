@@ -9,6 +9,7 @@ enum WebControllers {
   ticket,
   support,
   home,
+  fcm,
 }
 enum WebMethods {
   init,
@@ -28,6 +29,7 @@ enum WebMethods {
   referral,
   category_list,
   create_comment,
+  devices,
 }
 
 class RequestHelper {
@@ -349,6 +351,22 @@ class RequestHelper {
         webMethod: WebMethods.referral,
         body: {
           "phone_number": phoneNumber
+        },
+        header: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer ${token}"
+        }).timeout(
+      Duration(seconds: 50),
+    );
+  }
+
+  static Future<ApiResult> registrationId({String token, String registration_id}) async {
+    return await RequestHelper._makeRequestPost(
+        webController: WebControllers.fcm,
+        webMethod: WebMethods.devices,
+        body: {
+          "registration_id": registration_id,
+          "type": "android",
         },
         header: {
           'Accept': 'application/json',

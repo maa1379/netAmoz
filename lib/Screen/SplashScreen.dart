@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/ViewHelpers.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -39,6 +42,9 @@ class _SplashScreenState extends State<SplashScreen> {
     checkInternet();
     super.initState();
   }
+
+
+
 
   getProfileByToken() async {
     RequestHelper.getProfile(token: await PrefHelpers.getToken()).then((value) {

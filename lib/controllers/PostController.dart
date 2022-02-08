@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/models/CategoryModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:ehyasalamat/models/SinglePostModel.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -19,6 +23,33 @@ class PostController extends GetxController {
   RxBool hasSearch = false.obs;
   RxInt tvPage = 1.obs;
   RxInt radioPage = 1.obs;
+
+
+  getNot()async{
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      String token = await messaging.getToken();
+      log(token ?? '');
+    } catch (e) {}
+    log('firebase start');
+    FirebaseMessaging.onBackgroundMessage((RemoteMessage message){
+      print("123456789");
+      return;
+    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      RemoteNotification notification = message.notification;
+      log('new message');
+      print(message.notification.title);
+      print(message.notification.body);
+      if (message is RemoteMessage) {
+        Get.snackbar(
+          message.notification?.title ?? '',
+          message.notification?.body ?? '',
+          backgroundColor: Colors.white.withOpacity(0.9),
+        );
+      }
+    });
+  }
 
   ScrollController postController = ScrollController();
 
@@ -160,9 +191,12 @@ class PostController extends GetxController {
 
   @override
   void onInit() {
+    getNot();
     getPost();
     super.onInit();
   }
+
+
 }
 
 class CategoryController extends GetxController {
