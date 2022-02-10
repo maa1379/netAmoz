@@ -211,7 +211,7 @@ class CategoriesScreen extends StatelessWidget {
             controller.lastCategories.length);
         this.controller.postModel = null;
         this.controller.posts = [];
-        this.controller.currentPostPage = 1;
+        this.controller.currentPostPage = 1.obs;
         if (controller.lastCategories.length == 0) {
           Get.back();
           return;

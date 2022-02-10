@@ -1,5 +1,10 @@
+import 'dart:developer';
+
+import 'package:ehyasalamat/widgets/ConsultingWidget.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:ehyasalamat/bloc/GetDetailConsultingBloc.dart';
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
@@ -11,9 +16,63 @@ import 'package:ehyasalamat/models/GetTicketModel.dart';
 class ConsultingController extends GetxController {
   @override
   void onInit() {
+    getNot();
     getTicketData();
     super.onInit();
   }
+
+
+
+  AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      'This channel is used for important notifications.', // description
+      importance: Importance.high,
+      playSound: true);
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  getNot() async {
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      String token = await messaging.getToken();
+      log(token ?? '');
+    } catch (e) {}
+    log('firebase start');
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      getTicketData();
+      Get.to(ConsultingWidget());
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      if (notification != null && android != null) {
+        getTicketData();
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_launcher',
+              ),
+            ));
+      }
+    });
+  }
+
 
   RxList<GetTicketModel> getTicketList = <GetTicketModel>[].obs;
 
@@ -25,6 +84,7 @@ class ConsultingController extends GetxController {
             token: await PrefHelpers.getToken(), filter: filters)
         .then((value) {
       if (value.isDone) {
+        getTicketList.clear();
         print("***ok***");
         for (var i in value.data) {
           getTicketList.add(GetTicketModel.fromJson(i));

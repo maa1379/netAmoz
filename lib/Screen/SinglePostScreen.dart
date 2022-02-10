@@ -32,7 +32,11 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
 
   @override
   void initState() {
-    commentController.GetSinglePost(postID: widget.post.id.toString());
+    if(widget.post?.id == null){
+      print("cm null");
+    }else{
+    commentController.GetSinglePost(postID: widget.post?.id?.toString());
+    }
     super.initState();
   }
 
@@ -121,7 +125,7 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
               color: Colors.red,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: NetworkImage(widget.post.image),
+                image: NetworkImage(widget.post.image.toString()),
               ),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(200),
@@ -486,7 +490,6 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
                     postID: commentController.singlePost.id.toString(),
                   );
                   this.commentController.textController.clear();
-                  this.setState(() {});
                 },
                 child: Container(
                   margin: EdgeInsets.all(Get.width * .01),

@@ -149,7 +149,7 @@ class AllPostScreen extends StatelessWidget {
               size: Get.size,
               image: post.image,
               func: () {
-                Get.to(() => SinglePostScreen());
+                Get.to(() => SinglePostScreen(post: allPostController.postList[index],));
               },
             );
           },

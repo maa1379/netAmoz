@@ -17,6 +17,7 @@ void main() async {
     badge: true,
     sound: true,
   );
+
   SystemChrome.setPreferredOrientations(
     [
       DeviceOrientation.portraitUp,

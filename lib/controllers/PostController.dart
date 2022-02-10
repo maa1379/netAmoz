@@ -2,14 +2,15 @@ import 'dart:developer';
 
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
+import 'package:ehyasalamat/helpers/ViewHelpers.dart';
 import 'package:ehyasalamat/models/CategoryModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:ehyasalamat/models/SinglePostModel.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
 class PostController extends GetxController {
@@ -24,37 +25,73 @@ class PostController extends GetxController {
   RxInt tvPage = 1.obs;
   RxInt radioPage = 1.obs;
 
+  AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      'This channel is used for important notifications.', // description
+      importance: Importance.high,
+      playSound: true);
 
-  getNot()async{
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  getNot() async {
     try {
       FirebaseMessaging messaging = FirebaseMessaging.instance;
       String token = await messaging.getToken();
       log(token ?? '');
     } catch (e) {}
     log('firebase start');
-    FirebaseMessaging.onBackgroundMessage((RemoteMessage message){
-      print("123456789");
-      return;
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      getPost();
     });
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification notification = message.notification;
-      log('new message');
-      print(message.notification.title);
-      print(message.notification.body);
-      if (message is RemoteMessage) {
-        Get.snackbar(
-          message.notification?.title ?? '',
-          message.notification?.body ?? '',
-          backgroundColor: Colors.white.withOpacity(0.9),
-        );
+      AndroidNotification android = message.notification?.android;
+      if (notification != null && android != null) {
+        getPost();
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_launcher',
+              ),
+            ));
       }
     });
+
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    //   RemoteNotification notification = message.notification;
+    //   log('new message');
+    //   print(message.notification.title);
+    //   print(message.notification.body);
+    //   if (message is RemoteMessage) {
+    //     Get.snackbar(
+    //       message.notification?.title ?? '',
+    //       message.notification?.body ?? '',
+    //       backgroundColor: Colors.white.withOpacity(0.9),
+    //     );
+    //   }
+    // });
   }
 
   ScrollController postController = ScrollController();
 
   getPost() async {
-    RequestHelper.posts(id: "all", token: await PrefHelpers.getToken())
+    RequestHelper.posts(id: "all", token: await PrefHelpers.getToken(),page: 1.obs)
         .then((value) {
       if (value.isDone) {
         allPostList.clear();
@@ -139,7 +176,7 @@ class PostController extends GetxController {
   getTVPost() async {
     RequestHelper.posts(
             id: "all",
-            page: tvPage.toString(),
+            page: tvPage,
             token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone) {
@@ -160,7 +197,7 @@ class PostController extends GetxController {
   getRadioPost() async {
     RequestHelper.posts(
             id: "all",
-            page: radioPage.toString(),
+            page: radioPage,
             token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone) {
@@ -195,8 +232,6 @@ class PostController extends GetxController {
     getPost();
     super.onInit();
   }
-
-
 }
 
 class CategoryController extends GetxController {
@@ -277,10 +312,10 @@ class AllPostController extends GetxController {
   getPost() async {
     RequestHelper.posts(
             id: "all",
-            page: page.toString(),
+            page: page,
             token: await PrefHelpers.getToken())
         .then((value) {
-      if (value.isDone) {
+      if (value.isDone && value.statusCode != 404) {
         for (var i in value.data['results']) {
           allPostList.add(Result.fromJson(i));
         }
@@ -291,7 +326,11 @@ class AllPostController extends GetxController {
           }
         });
         loading.value = true;
-      } else {
+      } else if(value.statusCode == 404){
+        page.value = 1;
+        ViewHelper.showErrorDialog(Get.context,"پستی یافت نشد");
+        // loading.value = false;
+      }else{
         loading.value = false;
       }
     });

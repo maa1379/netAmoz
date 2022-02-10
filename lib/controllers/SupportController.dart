@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:ehyasalamat/Screen/SupportScreen.dart';
 import 'package:ehyasalamat/helpers/ViewHelpers.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:ehyasalamat/bloc/GetDetailSupportTicketBloc.dart';
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
@@ -65,10 +69,67 @@ class SupportStepperController extends GetxController {
 
   @override
   void onInit() {
+    getNot();
     getSupportSection();
     getSupportTicketList();
     super.onInit();
   }
+
+
+
+  AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      'This channel is used for important notifications.', // description
+      importance: Importance.high,
+      playSound: true);
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+
+  getNot() async {
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      String token = await messaging.getToken();
+      log(token ?? '');
+    } catch (e) {}
+    log('firebase start');
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      getSupportTicketList();
+      Get.to(SupportWidget());
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      if (notification != null && android != null) {
+        getSupportTicketList();
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_launcher',
+              ),
+            ));
+      }
+    });
+  }
+
+
+
 }
 
 class SupportTicketDetailController extends GetxController {

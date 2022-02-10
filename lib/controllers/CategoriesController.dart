@@ -88,7 +88,7 @@ class CategoriesController extends GetxController {
 
   CategoriesModel category;
 
-  int currentPostPage = 1;
+  RxInt currentPostPage = 1.obs;
 
   List<Result> posts = [];
   PostModel postModel;
@@ -109,7 +109,7 @@ class CategoriesController extends GetxController {
     ApiResult result = await RequestHelper.posts(
       id: lastCategories.last.id.toString(),
       token: await PrefHelpers.getToken(),
-      page: this.currentPostPage.toString(),
+      page: this.currentPostPage,
     );
     if (result.isDone) {
       this.postModel = PostModel.fromJson(result.data);

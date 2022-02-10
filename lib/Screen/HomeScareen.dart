@@ -1,12 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:ehyasalamat/Screen/RadioEhyeScreen.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
+import 'package:ehyasalamat/controllers/NotificationsController.dart';
 import 'package:ehyasalamat/helpers/AlertHelper.dart';
 import 'package:ehyasalamat/helpers/NavHelper.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
 import 'package:ehyasalamat/models/DrawerModel.dart';
-import 'package:ehyasalamat/models/TabBarModel.dart';
+import 'package:ehyasalamat/plugins/nav_bar/curved_navigation_bar.dart';
 import 'package:ehyasalamat/widgets/ConsultingWidget.dart';
 import 'package:ehyasalamat/widgets/EditProfileWidget.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _index = 0;
   int isPage = 2;
   bool isActive = false;
+  NotificationsController pushNot = Get.put(NotificationsController());
   PageController pageController = PageController();
   PageController controller = PageController(initialPage: 2);
   GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();

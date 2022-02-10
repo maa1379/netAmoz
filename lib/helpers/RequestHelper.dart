@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 enum WebControllers {
@@ -465,9 +466,9 @@ class RequestHelper {
   static Future<ApiResult> posts({
     String id = "",
     String token,
-    String page,
+    RxInt page,
   }) async {
-    String url = "http://87.107.172.122/api/home/posts_list/$id?${(page == null)?"":page}";
+    String url = "http://87.107.172.122/api/home/posts_list/$id?page=${page.value.toString() == null ?1:page.value.toString() }";
     print(url);
     http.Response response = await http.get(Uri.parse(url), headers: {
       'Accept': 'application/json',
