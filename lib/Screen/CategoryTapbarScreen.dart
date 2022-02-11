@@ -55,35 +55,33 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    return _buildCategoriesItem();
+    return Obx(() => _buildCategoriesItem());
   }
 
   _buildCategoriesItem() {
-    if (postController.loading.value == false) {
+    if (!postController.loading.value) {
       return LoadingDialog();
     }
-    return Obx(
-      () => Container(
-        height: size.height,
-        width: size.width,
-        child: SingleChildScrollView(
-          child: AnimationLimiter(
-            child: Stack(
-              children: AnimationConfiguration.toStaggeredList(
-                delay: Duration(milliseconds: 125),
-                duration: const Duration(milliseconds: 375),
-                childAnimationBuilder: (widget) => SlideAnimation(
-                  horizontalOffset: 100.0,
-                  child: FadeInAnimation(
-                    curve: Curves.easeInOutCubic,
-                    child: widget,
-                  ),
+    return Container(
+      height: size.height,
+      width: size.width,
+      child: SingleChildScrollView(
+        child: AnimationLimiter(
+          child: Stack(
+            children: AnimationConfiguration.toStaggeredList(
+              delay: Duration(milliseconds: 125),
+              duration: const Duration(milliseconds: 375),
+              childAnimationBuilder: (widget) => SlideAnimation(
+                horizontalOffset: 100.0,
+                child: FadeInAnimation(
+                  curve: Curves.easeInOutCubic,
+                  child: widget,
                 ),
-                children: [
-                  _buildMainItem(),
-                  _buildTopSlider(),
-                ],
               ),
+              children: [
+                _buildMainItem(),
+                _buildTopSlider(),
+              ],
             ),
           ),
         ),
@@ -189,7 +187,12 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
               CategoriesModel cat = categoryController.categoriesList[index];
               return GestureDetector(
                 onTap: () {
-                  Get.to(() => CategoriesScreen(),arguments: [cat,],);
+                  Get.to(
+                    () => CategoriesScreen(),
+                    arguments: [
+                      cat,
+                    ],
+                  );
                 },
                 child: Padding(
                   padding: EdgeInsets.symmetric(
@@ -297,15 +300,21 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
         children: [
           Expanded(
             child: CarouselSlider(
-              items: imgList.map((i) {
+              items: postController.specialPostList.map((i) {
                 return Builder(
                   builder: (BuildContext context) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        "assets/images/636578_472.jpg",
-                        fit: BoxFit.cover,
-                        width: double.maxFinite,
+                    return GestureDetector(
+                      onTap: (){
+                        Get.to(SinglePostScreen(post: i));
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: FadeInImage.assetNetwork(
+                          image: i.image,
+                          placeholder: "assets/anim/loading.gif",
+                          fit: BoxFit.cover,
+                          width: double.maxFinite,
+                        ),
                       ),
                     );
                   },
@@ -342,7 +351,7 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                 _current = value;
               });
             },
-            count: imgList.length,
+            count: postController.specialPostList.length,
             effect: ExpandingDotsEffect(
                 activeDotColor: Colors.black54,
                 dotWidth: size.width * .016,

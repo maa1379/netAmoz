@@ -43,6 +43,11 @@ class PostModel {
       };
 }
 
+// To parse this JSON data, do
+//
+//     final result = resultFromJson(jsonString);
+
+
 class Result {
   Result({
     this.id,
@@ -56,6 +61,7 @@ class Result {
     this.radioEhya,
     this.ehyaTv,
     this.published,
+    this.specialPost,
     this.datePublished,
   });
 
@@ -70,42 +76,42 @@ class Result {
   bool radioEhya;
   bool ehyaTv;
   bool published;
+  bool specialPost;
   String datePublished;
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-        id: json["id"],
-        title: json["title"],
-        category: json["category"],
-        image: json["image"],
-        file: json["file"],
-        shortDescription: json["short_description"],
-        tags: List<Tag>.from(json["tags"].map((x) => Tag.fromJson(x))),
-        linkTv: json["link_tv"],
-        radioEhya: json["radio_ehya"],
-        ehyaTv: json["ehya_tv"],
-        published: json["published"],
-        datePublished: json["date_published"],
-      );
-
-  static List<Result> listFromJson(List data) {
-    return List<Result>.from(data.map((x) => Result.fromJson(x)));
-  }
+    id: json["id"],
+    title: json["title"],
+    category: json["category"],
+    image: json["image"],
+    file: json["file"],
+    shortDescription: json["short_description"],
+    tags: List<Tag>.from(json["tags"].map((x) => Tag.fromJson(x))),
+    linkTv: json["link_tv"],
+    radioEhya: json["radio_ehya"],
+    ehyaTv: json["ehya_tv"],
+    published: json["published"],
+    specialPost: json["special_post"],
+    datePublished: json["date_published"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "title": title,
-        "category": category,
-        "image": image,
-        "file": file,
-        "short_description": shortDescription,
-        "tags": List<dynamic>.from(tags.map((x) => x.toJson())),
-        "link_tv": linkTv,
-        "radio_ehya": radioEhya,
-        "ehya_tv": ehyaTv,
-        "published": published,
-        "date_published": datePublished,
-      };
+    "id": id,
+    "title": title,
+    "category": category,
+    "image": image,
+    "file": file,
+    "short_description": shortDescription,
+    "tags": List<dynamic>.from(tags.map((x) => x.toJson())),
+    "link_tv": linkTv,
+    "radio_ehya": radioEhya,
+    "ehya_tv": ehyaTv,
+    "published": published,
+    "special_post": specialPost,
+    "date_published": datePublished,
+  };
 }
+
 
 class Tag {
   Tag({

@@ -18,6 +18,9 @@ class PostController extends GetxController {
   RxList<Result> postList = <Result>[].obs;
   RxList<Result> rPostList = <Result>[].obs;
   RxList<Result> tvPostList = <Result>[].obs;
+  RxList<Result> tvSpecialPostList = <Result>[].obs;
+  RxList<Result> rSpecialPostList = <Result>[].obs;
+  RxList<Result> specialPostList = <Result>[].obs;
   RxList<String> listOfHistory = <String>[].obs;
   RxBool loading = false.obs;
   RxBool loadingSearch = false.obs;
@@ -91,19 +94,26 @@ class PostController extends GetxController {
   ScrollController postController = ScrollController();
 
   getPost() async {
-    RequestHelper.posts(id: "all", token: await PrefHelpers.getToken(),page: 1.obs)
+    RequestHelper.posts(
+            id: "all", token: await PrefHelpers.getToken(), page: 1.obs)
         .then((value) {
       if (value.isDone) {
         allPostList.clear();
         postList.clear();
         rPostList.clear();
         tvPostList.clear();
+        tvSpecialPostList.clear();
+        rSpecialPostList.clear();
+        specialPostList.clear();
         for (var i in value.data['results']) {
           allPostList.add(Result.fromJson(i));
         }
 
-        allPostList.forEach((element) {
-          if (!element.ehyaTv && !element.radioEhya && element.published) {
+        allPostList.map((element) {
+          if (!element.ehyaTv &&
+              !element.radioEhya &&
+              element.published &&
+              !element.specialPost) {
             postList.add(element);
           } else if (element.radioEhya &&
               !element.ehyaTv &&
@@ -117,7 +127,39 @@ class PostController extends GetxController {
             tvPostList.add(element);
             rPostList.add(element);
           }
-        });
+        }).toList();
+
+        allPostList.map((element) {
+          if (element.ehyaTv &&
+              !element.radioEhya &&
+              element.published &&
+              element.specialPost) {
+            tvSpecialPostList.add(element);
+          } else if (!element.ehyaTv &&
+              element.radioEhya &&
+              element.published &&
+              element.specialPost) {
+            rSpecialPostList.add(element);
+          } else if (element.ehyaTv &&
+              element.radioEhya &&
+              element.published &&
+              element.specialPost) {
+            rSpecialPostList.add(element);
+            tvSpecialPostList.add(element);
+          } else if (!element.ehyaTv &&
+              !element.radioEhya &&
+              element.published &&
+              element.specialPost) {
+            specialPostList.add(element);
+          }
+        }).toList();
+
+        print("****************************");
+        print(rSpecialPostList.length);
+        print(tvSpecialPostList.length);
+        print(specialPostList.length);
+        print("****************************");
+
         loading.value = true;
       } else {
         loading.value = false;
@@ -175,9 +217,7 @@ class PostController extends GetxController {
 
   getTVPost() async {
     RequestHelper.posts(
-            id: "all",
-            page: tvPage,
-            token: await PrefHelpers.getToken())
+            id: "all", page: tvPage, token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone) {
         for (var i in value.data['results']) {
@@ -196,9 +236,7 @@ class PostController extends GetxController {
 
   getRadioPost() async {
     RequestHelper.posts(
-            id: "all",
-            page: radioPage,
-            token: await PrefHelpers.getToken())
+            id: "all", page: radioPage, token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone) {
         for (var i in value.data['results']) {
@@ -311,9 +349,7 @@ class AllPostController extends GetxController {
 
   getPost() async {
     RequestHelper.posts(
-            id: "all",
-            page: page,
-            token: await PrefHelpers.getToken())
+            id: "all", page: page, token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone && value.statusCode != 404) {
         for (var i in value.data['results']) {
@@ -326,11 +362,11 @@ class AllPostController extends GetxController {
           }
         });
         loading.value = true;
-      } else if(value.statusCode == 404){
+      } else if (value.statusCode == 404) {
         page.value = 1;
-        ViewHelper.showErrorDialog(Get.context,"پستی یافت نشد");
+        ViewHelper.showErrorDialog(Get.context, "پستی یافت نشد");
         // loading.value = false;
-      }else{
+      } else {
         loading.value = false;
       }
     });

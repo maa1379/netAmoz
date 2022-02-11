@@ -66,7 +66,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       print(value.data);
       if (value.isDone) {
         getProfileBlocInstance.getProfile(ProfileModel.fromJson(value.data));
-        Get.put(PostController());
+        // Get.put(PostController());
         Get.to(HomeScreen());
       } else {
         print("faild");

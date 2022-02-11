@@ -35,6 +35,11 @@ class PrefHelpers {
     return await Prefs.getList('list');
   }
 
+
+  static void removeList()async{
+    return await Prefs.clearList('list');
+  }
+
 // static Future<bool> logOut() async {
   //   await Prefs.set('mobile', null);
   //   await Prefs.set('transmissionId', null);

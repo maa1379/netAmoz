@@ -361,21 +361,7 @@ class RequestHelper {
     );
   }
 
-  static Future<ApiResult> registrationId({String token, String registration_id}) async {
-    return await RequestHelper._makeRequestPost(
-        webController: WebControllers.fcm,
-        webMethod: WebMethods.devices,
-        body: {
-          "registration_id": registration_id,
-          "type": "android",
-        },
-        header: {
-          'Accept': 'application/json',
-          HttpHeaders.authorizationHeader: "Bearer ${token}"
-        }).timeout(
-      Duration(seconds: 50),
-    );
-  }
+
 
   static Future<ApiResult> createComment({
     String token,
@@ -462,6 +448,62 @@ class RequestHelper {
 //  **************************************************************************
 //  **************************************************************************
 //  **************************************************************************
+
+
+
+  static Future<ApiResult> registrationId({
+    String token,
+    String registration_id,
+  }) async {
+    String url = "http://87.107.172.122/api/fcm/devices/";
+    print(url);
+    http.Response response = await http.post(Uri.parse(url), body: {
+      "registration_id": registration_id,
+      "type": "android",
+    },headers: {
+      'Accept': 'application/json',
+      HttpHeaders.authorizationHeader: "Bearer ${token}"
+    });
+    ApiResult apiResult = new ApiResult();
+    apiResult.statusCode = response.statusCode;
+    if (response.statusCode == 200) {
+      try {
+        print(response.body);
+        Map data = jsonDecode(response.body);
+        apiResult.isDone = data['isDone'] == true;
+        apiResult.requestedMethod = data['requestedMethod'].toString();
+        apiResult.data = data['data'];
+      } catch (e) {
+        apiResult.isDone = false;
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+
+        apiResult.requestedMethod = 'fcm';
+        apiResult.data = response.body;
+      }
+    } else {
+      apiResult.isDone = true;
+    }
+    print("\nRequest url: $url\nResponse: {"
+        "status: ${response.statusCode}\n"
+        "isDone: ${apiResult.isDone}\n"
+        "data: ${apiResult.data}"
+        "}");
+    return apiResult;
+  }
+
+
+
+
+
+
+
+
+
+
 
   static Future<ApiResult> posts({
     String id = "",
@@ -624,6 +666,11 @@ class RequestHelper {
     return apiResult;
   }
 }
+
+
+
+
+
 
 class ApiResult {
   bool isDone;

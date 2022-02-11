@@ -3,6 +3,7 @@ import 'package:ehyasalamat/bloc/ProfileBloc.dart';
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/ViewHelpers.dart';
+import 'package:ehyasalamat/models/ProfileModel.dart';
 import 'package:flutter/material.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
 
@@ -19,11 +20,21 @@ class _IncreasePointsScreenState extends State<IncreasePointsScreen> {
   getPoint()async{
     RequestHelper.referral(token: await PrefHelpers.getToken(),phoneNumber: mobileTextEditingController.text).then((value){
       if(value.isDone){
+        getProfileByToken();
         ViewHelper.showSuccessDialog(context, "اطلاعات ذخیره شد");
       }else if (value.statusCode == 400){
         ViewHelper.showErrorDialog(context,"شما قبلا معرف خود را ثبت کردید");
       }else{
         ViewHelper.showErrorDialog(context,"ارتباط برقرار نشد");
+      }
+    });
+  }
+
+  getProfileByToken() async {
+    RequestHelper.getProfile(token: await PrefHelpers.getToken()).then((value) {
+      print(value.data);
+      if (value.isDone) {
+        getProfileBlocInstance.getProfile(ProfileModel.fromJson(value.data));
       }
     });
   }

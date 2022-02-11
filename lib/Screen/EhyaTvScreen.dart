@@ -8,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:frefresh/frefresh.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -29,7 +28,6 @@ class EhyaTvScreen extends StatefulWidget {
 }
 
 class _EhyaTvScreenState extends State<EhyaTvScreen> {
-
   PostController postController = Get.find<PostController>();
 
   Size size;
@@ -38,6 +36,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
   bool grid = false;
   CarouselController buttonCarouselController = CarouselController();
   TextEditingController searchTextEditingController = TextEditingController();
+
   // int page = 1;
   List get imgList => [
         "assets/images/drravazadeh.png",
@@ -45,10 +44,8 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
         "assets/images/drravazadeh.png",
       ];
 
-
-
   RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   void _onRefresh() async {
     postController.getTVPost();
@@ -61,13 +58,6 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     // if (mounted) setState(() {});
     _refreshController.loadComplete();
   }
-
-
-
-
-
-
-
 
   AnimateIconController c1;
 
@@ -104,10 +94,11 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
-        height: size.height,
-        width: size.width,
-        child: Obx(()=>_buildCategoriesItem(),)
-      ),
+          height: size.height,
+          width: size.width,
+          child: Obx(
+            () => _buildCategoriesItem(),
+          )),
     );
   }
 
@@ -146,15 +137,21 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
         children: [
           Expanded(
             child: CarouselSlider(
-              items: imgList.map((i) {
+              items: postController.tvSpecialPostList.map((i) {
                 return Builder(
                   builder: (BuildContext context) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        "assets/images/636578_472.jpg",
-                        fit: BoxFit.cover,
-                        width: double.maxFinite,
+                    return GestureDetector(
+                      onTap: () {
+                        Get.to(SingleTvScreen(post: i));
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: FadeInImage.assetNetwork(
+                          image: i.image,
+                          placeholder: "assets/anim/loading.gif",
+                          fit: BoxFit.cover,
+                          width: double.maxFinite,
+                        ),
                       ),
                     );
                   },
@@ -191,7 +188,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                 _current = value;
               });
             },
-            count: imgList.length,
+            count: postController.tvSpecialPostList.length,
             effect: ExpandingDotsEffect(
                 activeDotColor: Colors.black54,
                 dotWidth: size.width * .016,
@@ -815,13 +812,11 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
             children: [
               Flexible(
                 flex: 4,
-                child: Get.find<PostController>().loading.value == true
-                    ? FadeInImage.assetNetwork(
+                child: FadeInImage.assetNetwork(
                         placeholder: "assets/anim/loading.gif",
                         image: post.image,
                         fit: BoxFit.cover,
                       )
-                    : Image.asset("assets/anim/loading.gif"),
               ),
               SizedBox(
                 height: size.height * .005,

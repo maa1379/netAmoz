@@ -19,6 +19,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import 'SinglePostScreen.dart';
 import 'SingleRadioScreen.dart';
 
 extension jalalDate on Jalali {
@@ -133,15 +134,21 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
         children: [
           Expanded(
             child: CarouselSlider(
-              items: postController.rPostList.map((i) {
+              items: postController.rSpecialPostList.map((i) {
                 return Builder(
                   builder: (BuildContext context) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        i.image,
-                        fit: BoxFit.cover,
-                        width: double.maxFinite,
+                    return GestureDetector(
+                      onTap: (){
+                        Get.to(SingleRadioScreen(post: i));
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: FadeInImage.assetNetwork(
+                          image: i.image,
+                          placeholder: "assets/anim/loading.gif",
+                          fit: BoxFit.cover,
+                          width: double.maxFinite,
+                        ),
                       ),
                     );
                   },
@@ -178,7 +185,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                 _current = value;
               });
             },
-            count: postController.rPostList.length,
+            count: postController.rSpecialPostList.length,
             effect: ExpandingDotsEffect(
                 activeDotColor: Colors.black54,
                 dotWidth: size.width * .016,

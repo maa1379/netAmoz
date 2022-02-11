@@ -91,7 +91,9 @@ class CategoriesController extends GetxController {
   RxInt currentPostPage = 1.obs;
 
   List<Result> posts = [];
+  List<Result> post = [];
   PostModel postModel;
+
   @override
   void onInit() {
     this.isPostsLoaded.value = false;
@@ -113,9 +115,14 @@ class CategoriesController extends GetxController {
     );
     if (result.isDone) {
       this.postModel = PostModel.fromJson(result.data);
-      this.posts.addAll(
+      this.post.addAll(
             this.postModel.results,
           );
+      post.forEach((element) {
+        if (!element.ehyaTv && !element.radioEhya && element.published) {
+          posts.add(element);
+        }
+      });
 
       this.isPostsLoaded.value = true;
     }
