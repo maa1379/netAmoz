@@ -70,6 +70,7 @@ class PostController extends GetxController {
                 channel.description,
                 color: Colors.blue,
                 playSound: true,
+                onlyAlertOnce: true,
                 icon: '@mipmap/ic_launcher',
               ),
             ));

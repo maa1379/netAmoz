@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import 'package:animate_icons/animate_icons.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ehyasalamat/controllers/PostController.dart';
-import 'package:ehyasalamat/helpers/RequestHelper.dart';
-import 'package:ehyasalamat/helpers/loading.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
 import 'package:ehyasalamat/models/MediaModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
@@ -19,7 +15,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import 'SinglePostScreen.dart';
 import 'SingleRadioScreen.dart';
 
 extension jalalDate on Jalali {
@@ -138,7 +133,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                 return Builder(
                   builder: (BuildContext context) {
                     return GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Get.to(SingleRadioScreen(post: i));
                       },
                       child: ClipRRect(
@@ -223,7 +218,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
 
   _buildItemList() {
     return Container(
-      height: size.height * .16,
+      height: size.height * .2,
       width: size.width,
       // margin: EdgeInsets.symmetric(horizontal: size.width * .02),
       child: Column(
@@ -241,29 +236,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Color(0xff7366FF), fontSize: 14),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    _buildAllCategoriesGridList();
-                  },
-                  child: Row(
-                    children: [
-                      AutoSizeText(
-                        "مشاهده همه بخش ها",
-                        maxLines: 1,
-                        maxFontSize: 22,
-                        minFontSize: 10,
-                        textAlign: TextAlign.center,
-                        style:
-                            TextStyle(color: Color(0xff7366FF), fontSize: 12),
-                      ),
-                      SizedBox(
-                        width: size.width * .01,
-                      ),
-                      Icon(Icons.arrow_forward_ios,
-                          size: size.width * .03, color: Colors.black45),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -272,7 +244,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: 10,
+              itemCount: postController.tvSpecialPostList.length,
               physics: BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               itemBuilder: (BuildContext context, int index) {
@@ -281,12 +253,18 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                     horizontal: size.width * .02,
                     vertical: size.height * .005,
                   ),
-                  child: WidgetHelper.ItemContainer(
-                      size: size,
-                      icon: "assets/images/crona.png",
-                      text: "بخش کرونا",
-                      gColor1: Colors.red,
-                      gColor2: Colors.blue),
+                  child: WidgetHelper.ItemPostContainer(
+                    text: postController.rSpecialPostList[index].title,
+                    size: size,
+                    image: postController.rSpecialPostList[index].image,
+                    func: () {
+                      Get.to(
+                        () => SingleRadioScreen(
+                          post: postController.rSpecialPostList[index],
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -667,8 +645,9 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
             children: [
               Flexible(
                 flex: 1,
-                child: Image.asset(
-                  "assets/images/audio-thumbnail.png",
+                child: FadeInImage.assetNetwork(
+                  placeholder: "assets/anim/loading.gif",
+                  image: post.image,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -841,8 +820,9 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
             children: [
               Flexible(
                 flex: 4,
-                child: Image.asset(
-                  "assets/images/audio-thumbnail.png",
+                child: FadeInImage.assetNetwork(
+                  placeholder: "assets/anim/loading.gif",
+                  image: post.image,
                   fit: BoxFit.cover,
                 ),
               ),

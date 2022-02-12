@@ -52,8 +52,8 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       if (value.isDone) {
         print("ok");
         PrefHelpers.setToken(value.data['access'].toString());
-        await getProfileByToken();
         getRegistrationId();
+        await getProfileByToken();
       } else {
         print("no");
         ViewHelper.showErrorDialog(context, "ورود با خطا مواجه شد");
@@ -74,21 +74,20 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
     });
   }
 
-
-  getRegistrationId()async{
+  getRegistrationId() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     String token = await messaging.getToken();
     log(token ?? '');
-    RequestHelper.registrationId(token: await PrefHelpers.getToken(),registration_id: token).then((value){
-      if(value.isDone){
+    RequestHelper.registrationId(
+            token: await PrefHelpers.getToken(), registration_id: token)
+        .then((value) {
+      if (value.isDone) {
         print("token ok");
-
-      }else{
+      } else {
         print("token not ok");
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {

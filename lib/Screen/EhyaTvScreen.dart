@@ -226,7 +226,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
 
   _buildItemList() {
     return Container(
-      height: size.height * .16,
+      height: size.height * .2,
       width: size.width,
       // margin: EdgeInsets.symmetric(horizontal: size.width * .02),
       child: Column(
@@ -252,7 +252,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: 10,
+              itemCount: postController.tvSpecialPostList.length,
               physics: BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               itemBuilder: (BuildContext context, int index) {
@@ -261,12 +261,18 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                     horizontal: size.width * .02,
                     vertical: size.height * .005,
                   ),
-                  child: WidgetHelper.ItemContainer(
-                      size: size,
-                      icon: "assets/images/crona.png",
-                      text: "بخش کرونا",
-                      gColor1: Colors.red,
-                      gColor2: Colors.blue),
+                  child: WidgetHelper.ItemPostContainer(
+                    text: postController.tvSpecialPostList[index].title,
+                    size: size,
+                    image: postController.tvSpecialPostList[index].image,
+                    func: () {
+                      Get.to(
+                        () => SingleTvScreen(
+                          post: postController.tvSpecialPostList[index],
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -811,13 +817,12 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
           child: Column(
             children: [
               Flexible(
-                flex: 4,
-                child: FadeInImage.assetNetwork(
-                        placeholder: "assets/anim/loading.gif",
-                        image: post.image,
-                        fit: BoxFit.cover,
-                      )
-              ),
+                  flex: 4,
+                  child: FadeInImage.assetNetwork(
+                    placeholder: "assets/anim/loading.gif",
+                    image: post.image,
+                    fit: BoxFit.cover,
+                  )),
               SizedBox(
                 height: size.height * .005,
               ),
