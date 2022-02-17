@@ -12,6 +12,10 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'SinglePostScreen.dart';
 
 class AllPostScreen extends StatelessWidget {
+
+  RxList<Result> listOfPost = <Result> [].obs;
+
+
   AllPostController allPostController = Get.put(AllPostController());
 
   RefreshController _refreshController =
@@ -107,55 +111,60 @@ class AllPostScreen extends StatelessWidget {
   }
 
   _buildAllPostList() {
-    return Expanded(
-      child: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        header: WaterDropHeader(),
-        footer: CustomFooter(
-          builder: (BuildContext context, LoadStatus mode) {
-            Widget body;
-            if (mode == LoadStatus.idle) {
-              body = Text("بکشید");
-            } else if (mode == LoadStatus.loading) {
-              body = CupertinoActivityIndicator();
-            } else if (mode == LoadStatus.failed) {
-              body = Text("درحال دریافت");
-            } else if (mode == LoadStatus.canLoading) {
-              body = Text("درحال دریافت");
-            } else {
-              body = Text("اطللاعاتی دریافت نشد");
-            }
-            return Container(
-              alignment: Alignment.center,
-              height: Get.height * .15,
-              width: Get.width * .2,
-              child: Center(child: body),
-            );
-          },
-        ),
-        controller: _refreshController,
-        onRefresh: _onRefresh,
-        scrollDirection: Axis.vertical,
-        onLoading: _onLoading,
-        child: GridView.builder(
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-          physics: BouncingScrollPhysics(),
-          itemBuilder: (BuildContext context, int index) {
-            Result post = allPostController.postList[index];
-            return WidgetHelper.ItemPostContainer(
-              text: post.title,
-              size: Get.size,
-              image: post.image,
-              func: () {
-                Get.to(() => SinglePostScreen(post: allPostController.postList[index],));
-              },
-            );
-          },
-          itemCount: allPostController.postList.length,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Expanded(
+        child: SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: true,
+          header: WaterDropHeader(),
+          footer: CustomFooter(
+            builder: (BuildContext context, LoadStatus mode) {
+              Widget body;
+              if (mode == LoadStatus.idle) {
+                body = Text("بکشید");
+              } else if (mode == LoadStatus.loading) {
+                body = CupertinoActivityIndicator();
+              } else if (mode == LoadStatus.failed) {
+                body = Text("درحال دریافت");
+              } else if (mode == LoadStatus.canLoading) {
+                body = Text("درحال دریافت");
+              } else {
+                body = Text("اطللاعاتی دریافت نشد");
+              }
+              return Container(
+                alignment: Alignment.center,
+                height: Get.height * .15,
+                width: Get.width * .2,
+                child: Center(child: body),
+              );
+            },
+          ),
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          scrollDirection: Axis.vertical,
+          onLoading: _onLoading,
+          child: GridView.builder(
+            gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+            physics: BouncingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              Result post = allPostController.postList[index];
+              return WidgetHelper.ItemPostContainer(
+                text: post.title,
+                size: Get.size,
+                image: post.image,
+                func: () {
+                  Get.to(() => SinglePostScreen(post: allPostController.postList[index],));
+                },
+              );
+            },
+            itemCount: allPostController.postList.length,
+          ),
         ),
       ),
     );
   }
+
+
 }

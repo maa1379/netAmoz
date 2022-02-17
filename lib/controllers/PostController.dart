@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 class PostController extends GetxController {
   RxList<Result> allPostList = <Result>[].obs;
   RxList<Result> postList = <Result>[].obs;
+  RxList<Result> ashPostList = <Result>[].obs;
   RxList<Result> rPostList = <Result>[].obs;
   RxList<Result> tvPostList = <Result>[].obs;
   RxList<Result> tvSpecialPostList = <Result>[].obs;
@@ -76,6 +77,12 @@ class PostController extends GetxController {
             ));
       }
     });
+
+
+
+
+
+
 
     // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     //   RemoteNotification notification = message.notification;
@@ -254,6 +261,32 @@ class PostController extends GetxController {
     });
   }
 
+  getPost1() async {
+    RequestHelper.posts(
+        id: "15", token: await PrefHelpers.getToken(), page: 1.obs)
+        .then((value) {
+      if (value.isDone) {
+        ashPostList.clear();
+        for (var i in value.data['results']) {
+          ashPostList.add(Result.fromJson(i));
+        }
+        loading.value = true;
+      } else {
+        loading.value = false;
+      }
+    });
+  }
+
+
+
+  @override
+  void onInit() {
+    getNot();
+    getPost();
+    getPost1();
+    super.onInit();
+  }
+
   //
   // @override
   // void dispose() {
@@ -265,12 +298,7 @@ class PostController extends GetxController {
   //   super.dispose();
   // }
 
-  @override
-  void onInit() {
-    getNot();
-    getPost();
-    super.onInit();
-  }
+
 }
 
 class CategoryController extends GetxController {
@@ -350,9 +378,11 @@ class AllPostController extends GetxController {
 
   getPost() async {
     RequestHelper.posts(
-            id: "all", page: page, token: await PrefHelpers.getToken())
+            id: Get.arguments["getCat_id"], page: page, token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone && value.statusCode != 404) {
+        allPostList.clear();
+        postList.clear();
         for (var i in value.data['results']) {
           allPostList.add(Result.fromJson(i));
         }
@@ -372,6 +402,11 @@ class AllPostController extends GetxController {
       }
     });
   }
+
+
+
+
+
 
   @override
   void onInit() {

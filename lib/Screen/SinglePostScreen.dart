@@ -32,10 +32,10 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
 
   @override
   void initState() {
-    if(widget.post?.id == null){
+    if (widget.post?.id == null) {
       print("cm null");
-    }else{
-    commentController.GetSinglePost(postID: widget.post?.id?.toString());
+    } else {
+      commentController.GetSinglePost(postID: widget.post?.id?.toString());
     }
     super.initState();
   }
@@ -217,7 +217,8 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Share.share("پست ها");
+              Share.share(
+                  widget.post.title + "\n" + widget.post.shortDescription);
             },
             child: Icon(
               Icons.share_outlined,

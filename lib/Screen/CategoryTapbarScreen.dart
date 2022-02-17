@@ -37,7 +37,7 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
   bool isLoading = false;
 
   RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController(initialRefresh: false);
 
   void _onRefresh() async {
     postController.getPost();
@@ -54,7 +54,9 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
+    size = MediaQuery
+        .of(context)
+        .size;
     return Obx(() => _buildCategoriesItem());
   }
 
@@ -71,13 +73,14 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
             children: AnimationConfiguration.toStaggeredList(
               delay: Duration(milliseconds: 125),
               duration: const Duration(milliseconds: 375),
-              childAnimationBuilder: (widget) => SlideAnimation(
-                horizontalOffset: 100.0,
-                child: FadeInAnimation(
-                  curve: Curves.easeInOutCubic,
-                  child: widget,
-                ),
-              ),
+              childAnimationBuilder: (widget) =>
+                  SlideAnimation(
+                    horizontalOffset: 100.0,
+                    child: FadeInAnimation(
+                      curve: Curves.easeInOutCubic,
+                      child: widget,
+                    ),
+                  ),
               children: [
                 _buildMainItem(),
                 _buildTopSlider(),
@@ -106,13 +109,14 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
           children: AnimationConfiguration.toStaggeredList(
             delay: Duration(milliseconds: 125),
             duration: const Duration(milliseconds: 375),
-            childAnimationBuilder: (widget) => SlideAnimation(
-              horizontalOffset: 100.0,
-              child: FadeInAnimation(
-                curve: Curves.easeInOutCubic,
-                child: widget,
-              ),
-            ),
+            childAnimationBuilder: (widget) =>
+                SlideAnimation(
+                  horizontalOffset: 100.0,
+                  child: FadeInAnimation(
+                    curve: Curves.easeInOutCubic,
+                    child: widget,
+                  ),
+                ),
             children: [
               SizedBox(
                 height: size.height * .12,
@@ -122,6 +126,10 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                 height: size.height * .03,
               ),
               _buildNewPostList(),
+              SizedBox(
+                height: size.height * .03,
+              ),
+              _buildCat1()
             ],
           ),
         ),
@@ -142,7 +150,7 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 AutoSizeText(
-                  "بخش های ویژه",
+                  "دسته بندی ها",
                   maxLines: 1,
                   maxFontSize: 22,
                   minFontSize: 10,
@@ -156,13 +164,13 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                   child: Row(
                     children: [
                       AutoSizeText(
-                        "مشاهده همه بخش ها",
+                        "مشاهده همه دسته ها",
                         maxLines: 1,
                         maxFontSize: 22,
                         minFontSize: 10,
                         textAlign: TextAlign.center,
                         style:
-                            TextStyle(color: Color(0xff7366FF), fontSize: 12),
+                        TextStyle(color: Color(0xff7366FF), fontSize: 12),
                       ),
                       SizedBox(
                         width: size.width * .01,
@@ -180,35 +188,36 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
           ),
           Expanded(
               child: ListView.builder(
-            itemCount: categoryController.categoriesList.length,
-            physics: BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (BuildContext context, int index) {
-              CategoriesModel cat = categoryController.categoriesList[index];
-              return GestureDetector(
-                onTap: () {
-                  Get.to(
-                    () => CategoriesScreen(),
-                    arguments: [
-                      cat,
-                    ],
+                itemCount: categoryController.categoriesList.length,
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  CategoriesModel cat = categoryController
+                      .categoriesList[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(
+                            () => CategoriesScreen(),
+                        arguments: [
+                          cat,
+                        ],
+                      );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: size.width * .02,
+                        vertical: size.height * .005,
+                      ),
+                      child: WidgetHelper.ItemContainer(
+                          size: size,
+                          icon: "assets/images/crona.png",
+                          text: cat.name,
+                          gColor1: Colors.red,
+                          gColor2: Colors.blue),
+                    ),
                   );
                 },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: size.width * .02,
-                    vertical: size.height * .005,
-                  ),
-                  child: WidgetHelper.ItemContainer(
-                      size: size,
-                      icon: "assets/images/crona.png",
-                      text: cat.name,
-                      gColor1: Colors.red,
-                      gColor2: Colors.blue),
-                ),
-              );
-            },
-          )),
+              )),
         ],
       ),
     );
@@ -238,7 +247,8 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Get.to(AllPostScreen());
+                        Get.to(()=>
+                            AllPostScreen(),arguments: {"getCat_id" : "all"});
                       },
                       child: AutoSizeText(
                         "مشاهده بلاگ همه مطالب",
@@ -247,7 +257,7 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                         minFontSize: 10,
                         textAlign: TextAlign.center,
                         style:
-                            TextStyle(color: Color(0xff7366FF), fontSize: 12),
+                        TextStyle(color: Color(0xff7366FF), fontSize: 12),
                       ),
                     ),
                     SizedBox(
@@ -265,25 +275,26 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
           ),
           Expanded(
               child: ListView.builder(
-            itemCount: postController.postList.length,
-            physics: BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (BuildContext context, int index) {
-              Result post = postController.postList[index];
-              return WidgetHelper.ItemPostContainer(
-                text: post.title,
-                size: size,
-                image: post.image,
-                func: () {
-                  Get.to(
-                    () => SinglePostScreen(
-                      post: post,
-                    ),
+                itemCount: postController.postList.length,
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  Result post = postController.postList[index];
+                  return WidgetHelper.ItemPostContainer(
+                    text: post.title,
+                    size: size,
+                    image: post.image,
+                    func: () {
+                      Get.to(
+                            () =>
+                            SinglePostScreen(
+                              post: post,
+                            ),
+                      );
+                    },
                   );
                 },
-              );
-            },
-          )),
+              )),
         ],
       ),
     );
@@ -304,7 +315,7 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                 return Builder(
                   builder: (BuildContext context) {
                     return GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Get.to(SinglePostScreen(post: i));
                       },
                       child: ClipRRect(
@@ -362,63 +373,82 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
     );
   }
 
-// _buildCat1() {
-//   return Container(
-//     height: size.height * .2,
-//     width: size.width,
-//     margin: EdgeInsets.symmetric(vertical: size.width * .02),
-//     child: Column(
-//       children: [
-//         Padding(
-//           padding: EdgeInsets.symmetric(horizontal: size.width * .05),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.start,
-//             children: [
-//               AutoSizeText(
-//                 "آش ها",
-//                 maxLines: 1,
-//                 maxFontSize: 22,
-//                 minFontSize: 10,
-//                 textAlign: TextAlign.center,
-//                 style: TextStyle(color: Color(0xff7366FF), fontSize: 14),
-//               ),
-//             ],
-//           ),
-//         ),
-//         SizedBox(
-//           height: size.height * .02,
-//         ),
-//         Expanded(
-//             child: ListView.builder(
-//           itemCount: listOfPostsCat1.length,
-//           physics: BouncingScrollPhysics(),
-//           scrollDirection: Axis.horizontal,
-//           itemBuilder: (BuildContext context, int index) {
-//             PostModel post = listOfPostsCat1[index];
-//             return WidgetHelper.ItemPostContainer(
-//               text: post.title.rendered,
-//               size: size,
-//               image: post.thumbnail,
-//               func: () {
-//                 Navigator.push(
-//                   context,
-//                   PageTransition(
-//                     type: PageTransitionType.fade,
-//                     duration: Duration(milliseconds: 500),
-//                     curve: Curves.easeInOutCubic,
-//                     child: SinglePostScreen(
-//                       post: post,
-//                     ),
-//                   ),
-//                 );
-//               },
-//             );
-//           },
-//         )),
-//       ],
-//     ),
-//   );
-// }
+  _buildCat1() {
+    return Container(
+      height: size.height * .2,
+      width: size.width,
+      margin: EdgeInsets.symmetric(vertical: size.width * .02),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: size.width * .05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AutoSizeText(
+                  "آش ها",
+                  maxLines: 1,
+                  maxFontSize: 22,
+                  minFontSize: 10,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xff7366FF), fontSize: 14),
+                ),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(()=>AllPostScreen(), arguments: {"getCat_id": "15"});
+                      },
+                      child: AutoSizeText(
+                        "مشاهده بلاگ همه مطالب",
+                        maxLines: 1,
+                        maxFontSize: 22,
+                        minFontSize: 10,
+                        textAlign: TextAlign.center,
+                        style:
+                        TextStyle(color: Color(0xff7366FF), fontSize: 12),
+                      ),
+                    ),
+                    SizedBox(
+                      width: size.width * .01,
+                    ),
+                    Icon(Icons.arrow_forward_ios,
+                        size: size.width * .03, color: Colors.black45),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: size.height * .02,
+          ),
+          Expanded(
+              child: ListView.builder(
+                itemCount: postController.ashPostList.length,
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  Result post = postController.ashPostList[index];
+                  return WidgetHelper.ItemPostContainer(
+                    text: post.title,
+                    size: size,
+                    image: post.image,
+                    func: () {
+                      Get.to(
+                            () =>
+                            SinglePostScreen(
+                              post: post,
+                            ),
+                      );
+                    },
+                  );
+                },
+              )),
+        ],
+      ),
+    );
+  }
+
 //
 // _buildCat2() {
 //   return Container(
@@ -614,11 +644,11 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
                     physics: BouncingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       CategoriesModel cat =
-                          categoryController.categoriesList[index];
+                      categoryController.categoriesList[index];
                       return GestureDetector(
                         onTap: () {
                           Get.to(
-                            () => CategoriesScreen(),
+                                () => CategoriesScreen(),
                             arguments: [
                               cat,
                             ],
@@ -651,59 +681,4 @@ class _CategoryTapbarScreenState extends State<CategoryTapbarScreen> {
   }
 }
 
-// SmartRefresher(
-// enablePullDown: true,
-// enablePullUp: true,
-// header: WaterDropHeader(),
-// footer: CustomFooter(
-// builder: (BuildContext context, LoadStatus mode) {
-// Widget body;
-// if (mode == LoadStatus.idle) {
-// body = Text("بکشید");
-// } else if (mode == LoadStatus.loading) {
-// body = CupertinoActivityIndicator();
-// } else if (mode == LoadStatus.failed) {
-// body = Text("درحال دریافت");
-// } else if (mode == LoadStatus.canLoading) {
-// body = Text("درحال دریافت");
-//
-// } else {
-// body = Text("اطللاعاتی دریافت نشد");
-// }
-// return Container(
-// alignment: Alignment.center,
-// height: size.height * .15,
-// width: size.width * .2,
-// child: Center(child: body),
-// );
-// },
-// ),
-// controller: _refreshController,
-// onRefresh: _onRefresh,
-// scrollDirection: Axis.horizontal,
-// onLoading: _onLoading,
-// child: ListView.builder(
-// itemBuilder: (BuildContext context, int index) {
-// Result post = postController.postList[index];
-// return WidgetHelper.ItemPostContainer(
-// text: post.title,
-// size: size,
-// image: post.image,
-// func: () {
-// Navigator.push(
-// context,
-// PageTransition(
-// type: PageTransitionType.fade,
-// duration: Duration(milliseconds: 500),
-// curve: Curves.easeInOutCubic,
-// child: SinglePostScreen(
-// post: post,
-// ),
-// ),
-// );
-// },
-// );
-// },
-// itemCount: postController.postList.length,
-// ),
-// ),
+
