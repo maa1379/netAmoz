@@ -11,6 +11,7 @@ enum WebControllers {
   support,
   home,
   fcm,
+  treasure,
 }
 enum WebMethods {
   init,
@@ -31,6 +32,9 @@ enum WebMethods {
   category_list,
   create_comment,
   devices,
+  create_get_treasure,
+  treasure_message,
+  retrieve_treasure,
 }
 
 class RequestHelper {
@@ -284,6 +288,59 @@ class RequestHelper {
       Duration(seconds: 50),
     );
   }
+
+
+  static Future<ApiResult> getTreasureRetrieve({String token, String id}) async {
+    return await RequestHelper._makeRequestGet(
+        webController: WebControllers.treasure,
+        webMethod: WebMethods.retrieve_treasure,
+        header: {
+          "id": id,
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer ${token}"
+        }).timeout(
+      Duration(seconds: 50),
+    );
+  }
+
+
+
+  static Future<ApiResult> sendTreasure(
+      {String topic,
+        String request_text,
+        var file,
+        String token}) async {
+    return await RequestHelper._makeRequestPost(
+        webController: WebControllers.treasure,
+        webMethod: WebMethods.create_get_treasure,
+        body: {
+          "topic": topic,
+          "link": request_text,
+          "base_64_file": file,
+        },
+        header: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer ${token}"
+        }).timeout(
+      Duration(seconds: 50),
+    );
+  }
+
+  static Future<ApiResult> getTreasure({String token}) async {
+    return await RequestHelper._makeRequestGet(
+      webController: WebControllers.treasure,
+      webMethod: WebMethods.create_get_treasure,
+        header: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer ${token}"
+        }
+    ).timeout(
+      Duration(seconds: 50),
+    );
+  }
+
+
+
 
   static Future<ApiResult> sendAnswer(
       {String ticket_id, String text, String token}) async {

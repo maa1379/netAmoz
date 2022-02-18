@@ -23,6 +23,7 @@ import 'EhyaTvScreen.dart';
 import 'IncreasePointsScreen.dart';
 import 'InviteFriendScreen.dart';
 import 'SupportScreen.dart';
+import 'TreasureScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -168,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         EditProfileWidget(),
                         ConsultingWidget(),
                         _buildCategories(),
-                        Container(),
+                        TreasureScreen(),
                         Container(),
                       ],
                     ),

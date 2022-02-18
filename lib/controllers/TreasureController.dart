@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:ehyasalamat/models/TreasureModel.dart';
 import 'package:ehyasalamat/widgets/ConsultingWidget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import 'package:ehyasalamat/helpers/ViewHelpers.dart';
 import 'package:ehyasalamat/models/GetDetailTicketModel.dart';
 import 'package:ehyasalamat/models/GetTicketModel.dart';
 
-class ConsultingController extends GetxController {
+class TreasureController extends GetxController {
   @override
   void onInit() {
     getNot();
@@ -73,20 +74,20 @@ class ConsultingController extends GetxController {
   }
 
 
-  RxList<GetTicketModel> getTicketList = <GetTicketModel>[].obs;
+  RxList<TreasureModel> getTicketList = <TreasureModel>[].obs;
 
   RxString filter = "all".obs;
   RxBool isFilter = false.obs;
 
-  getTicketData({String token, String filters = "all"}) async {
-    RequestHelper.getTickets(
-            token: await PrefHelpers.getToken(), filter: filters)
+  getTicketData({String token}) async {
+    RequestHelper.getTreasure(
+        token: await PrefHelpers.getToken())
         .then((value) {
       if (value.isDone) {
         getTicketList.clear();
         print("***ok***");
         for (var i in value.data) {
-          getTicketList.add(GetTicketModel.fromJson(i));
+          getTicketList.add(TreasureModel.fromJson(i));
           // isFilter = false.obs;
         }
       } else {
@@ -96,66 +97,30 @@ class ConsultingController extends GetxController {
   }
 }
 
-class DetailConsultingController extends GetxController {
+class DetailTreasureController extends GetxController {
+
+  RxBool loading = false.obs;
+
   @override
   void onInit() {
-    TicketList.clear();
     getDetailTicketData();
-    EasyLoading.show(
-        dismissOnTap: true, indicator: CircularProgressIndicator());
     super.onInit();
   }
 
   TextEditingController textController = TextEditingController();
-  RxList<AnswerList> TicketList = <AnswerList>[].obs;
+  TreasureModel TicketList;
 
   getDetailTicketData() async {
-    RequestHelper.getDetailTicket(
-            id: Get.arguments['ticket_id'].toString(),
-            token: await PrefHelpers.getToken())
+    RequestHelper.getTreasureRetrieve(
+        id: Get.arguments['treasure_id'].toString(),
+        token: await PrefHelpers.getToken())
         .then((value) async {
       if (value.isDone) {
-        print("***ok***");
-        getDetailTicketBlocInstance
-            .getProfile(GetDetailTicketModel.fromJson(value.data));
-        await Future.delayed(Duration(seconds: 5)).then((value) {
-          TicketList.add(
-            AnswerList(
-                user: "کاربر",
-                text: getDetailTicketBlocInstance.data.requestText,
-                createdAt: getDetailTicketBlocInstance.data.createdAt,
-                file: getDetailTicketBlocInstance.data.file),
-          );
-          EasyLoading.dismiss();
-        });
-        for (var i in value.data['answers']) {
-          TicketList.add(AnswerList.fromJson(i));
-        }
+          TicketList = TreasureModel.fromJson(value.data);
+          loading.value = true;
       } else {
+          loading.value = false;
         print("***error***");
-      }
-    });
-  }
-
-  createAnswer(String text) async {
-    RequestHelper.sendAnswer(
-            token: await PrefHelpers.getToken(),
-            text: text,
-            ticket_id: getDetailTicketBlocInstance.data.id.toString())
-        .then((value) {
-      print(value.data);
-      if (value.isDone || value.statusCode == 201) {
-        print("send");
-        FocusScope.of(Get.context).unfocus();
-      } else if (!value.isDone || value.statusCode == 400) {
-        print("can not send");
-        FocusScope.of(Get.context).unfocus();
-        ViewHelper.showErrorDialog(
-            Get.context, "شما به حداکثر تعداد مجاز پاسخ به سوال رسیده اید");
-      } else {
-        print("faild");
-        FocusScope.of(Get.context).unfocus();
-        ViewHelper.showErrorDialog(Get.context, "ارسال با خطا مواجه شد");
       }
     });
   }
