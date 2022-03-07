@@ -12,6 +12,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:frefresh/frefresh.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -44,6 +45,22 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
         "assets/images/drravazadeh.png",
       ];
 
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    postController.getTVPost();
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    postController.tvPage + 1;
+    postController.getTVPost();
+    // if (mounted) setState(() {});
+    _refreshController.loadComplete();
+  }
+
+
   TextEditingController searchTextEditingController = TextEditingController();
 
   // List get imgList => this.listOfAudios.map((e) => e.);
@@ -64,6 +81,10 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
     c1 = AnimateIconController();
     super.initState();
   }
+
+
+
+
 
   bool onEndIconPress(BuildContext context) {
     setState(() {
@@ -274,106 +295,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
     );
   }
 
-  _buildAllCategoriesGridList() {
-    return showMaterialModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: false,
-      context: context,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: size.height * .2),
-          child: Container(
-            height: size.height * .6,
-            width: size.width,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            margin: EdgeInsets.symmetric(horizontal: size.width * .05),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(size.width * .03),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Icon(
-                              Icons.close,
-                              size: size.width * .1,
-                              color: Color(0xff7366FF),
-                            )),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(size.width * .03),
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Row(
-                          children: [
-                            AutoSizeText(
-                              "همه دسته بندی ها",
-                              maxLines: 1,
-                              maxFontSize: 22,
-                              minFontSize: 10,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Color(0xff7366FF), fontSize: 16),
-                            ),
-                            SizedBox(
-                              width: size.width * .02,
-                            ),
-                            Image.asset(
-                              "assets/images/copy.png",
-                              width: size.width * .1,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * .02),
-                    child: GridView.builder(
-                      itemCount: 20,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 5.0,
-                        mainAxisSpacing: 5.0,
-                        childAspectRatio: 1,
-                      ),
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: size.width * .005,
-                              vertical: size.height * .005),
-                          child: WidgetHelper.ItemContainer(
-                              size: size,
-                              icon: "assets/images/crona.png",
-                              text: "بخش کرونا",
-                              gColor1: Colors.red,
-                              gColor2: Colors.blue),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   _buildIcon() {
     return Container(
@@ -418,38 +339,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
     );
   }
 
-  _buildDropDown() {
-    return DropdownButton(
-      hint: value == null
-          ? Center(child: Text('Dropdown'))
-          : Center(
-              child: Text(
-                value,
-                style: TextStyle(color: Colors.blue),
-              ),
-            ),
-      underline: Container(),
-      isExpanded: true,
-      iconSize: 30.0,
-      // borderRadius: BorderRadius.circular(15),
-      style: TextStyle(color: Colors.blue),
-      items: ['One', 'Two', 'Three'].map(
-        (val) {
-          return DropdownMenuItem<String>(
-            value: val,
-            child: Text(val),
-          );
-        },
-      ).toList(),
-      onChanged: (val) {
-        setState(
-          () {
-            value = val;
-          },
-        );
-      },
-    );
-  }
 
   _buildListITem() {
     return Expanded(
@@ -462,7 +351,8 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
   }
 
   Widget itemBuilder(BuildContext context, int index) {
-    Result post = postController.rPostList[index];
+    Result post = Get.find<PostController>().rPostList[index];
+
     if (searchTextEditingController.text.isEmpty) {
       return GestureDetector(
         onTap: () {
@@ -492,9 +382,11 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
             children: [
               Flexible(
                 flex: 1,
-                child: Image.asset(
-                  "assets/images/audio-thumbnail.png",
+                child: FadeInImage.assetNetwork(
+                  image: post.image,
+                  placeholder: "assets/anim/loading.gif",
                   fit: BoxFit.cover,
+                  width: double.maxFinite,
                 ),
               ),
               Column(
@@ -528,21 +420,10 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                       width: size.width * .55,
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
-                      child: Html(data: post.shortDescription),
-                      // AutoSizeText(
-                      //
-                      //       .replaceAll('<p>', '')
-                      //       .replaceAll('</p>', ''),
-                      //   maxLines: 4,
-                      //   maxFontSize: 22,
-                      //   minFontSize: 10,
-                      //   textAlign: TextAlign.start,
-                      //   softWrap: true,
-                      //   style: TextStyle(
-                      //     color: Colors.black38,
-                      //     fontSize: 12,
-                      //   ),
-                      // ),
+                      child: Text(
+                        post.shortDescription,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                   Flexible(
@@ -557,7 +438,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                             width: size.width * .01,
                           ),
                           AutoSizeText(
-                            "1400/05/23",
+                            post.datePublished,
                             maxLines: 4,
                             maxFontSize: 22,
                             minFontSize: 6,
@@ -571,14 +452,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                           SizedBox(
                             width: size.width * .02,
                           ),
-                          Image.asset(
-                            "assets/images/Union 2.png",
-                            width: size.width * .05,
-                          ),
-                          SizedBox(
-                            width: size.width * .02,
-                          ),
-                          Image.asset("assets/images/Comment.png"),
                           Container(
                             margin: EdgeInsets.only(right: size.width * .04),
                             height: size.height * .025,
@@ -614,8 +487,8 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
         ),
       );
     } else if (post.title
-            .toLowerCase()
-            .contains(searchTextEditingController.text) ||
+        .toLowerCase()
+        .contains(searchTextEditingController.text) ||
         post.title.toLowerCase().contains(searchTextEditingController.text)) {
       return GestureDetector(
         onTap: () {
@@ -646,9 +519,10 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
               Flexible(
                 flex: 1,
                 child: FadeInImage.assetNetwork(
-                  placeholder: "assets/anim/loading.gif",
                   image: post.image,
+                  placeholder: "assets/anim/loading.gif",
                   fit: BoxFit.cover,
+                  width: double.maxFinite,
                 ),
               ),
               Column(
@@ -685,20 +559,6 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
                       child: Html(
                         data: post.shortDescription,
                       ),
-                      // AutoSizeText(
-                      //
-                      //       .replaceAll('<p>', '')
-                      //       .replaceAll('</p>', ''),
-                      //   maxLines: 4,
-                      //   maxFontSize: 22,
-                      //   minFontSize: 10,
-                      //   textAlign: TextAlign.start,
-                      //   softWrap: true,
-                      //   style: TextStyle(
-                      //     color: Colors.black38,
-                      //     fontSize: 12,
-                      //   ),
-                      // ),
                     ),
                   ),
                   Flexible(
@@ -776,152 +636,80 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
 
   _buildGridITem() {
     return Expanded(
-      child: GridView.builder(
-        itemCount: postController.rPostList.length,
-        physics: BouncingScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 5.0,
-          mainAxisSpacing: 5.0,
-          childAspectRatio: 0.52,
-        ),
-        itemBuilder: itemGridBuilder,
-      ),
-    );
+        child: SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: true,
+          header: WaterDropHeader(),
+          footer: CustomFooter(
+            builder: (BuildContext context, LoadStatus mode) {
+              Widget body;
+              if (mode == LoadStatus.idle) {
+                body = Text("بکشید");
+              } else if (mode == LoadStatus.loading) {
+                body = CupertinoActivityIndicator();
+              } else if (mode == LoadStatus.failed) {
+                body = Text("درحال دریافت");
+              } else if (mode == LoadStatus.canLoading) {
+                body = Text("درحال دریافت");
+              } else {
+                body = Text("اطللاعاتی دریافت نشد");
+              }
+              return Container(
+                alignment: Alignment.center,
+                height: Get.height * .15,
+                width: Get.width * .2,
+                child: Center(child: body),
+              );
+            },
+          ),
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          scrollDirection: Axis.vertical,
+          onLoading: _onLoading,
+          child: GridView.builder(
+            itemCount: Get.find<PostController>().rPostList.length,
+            physics: BouncingScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 5.0,
+              mainAxisSpacing: 5.0,
+            ),
+            itemBuilder: itemGridBuilder,
+          ),
+        ));
   }
 
   Widget itemGridBuilder(BuildContext context, int index) {
-    Result post = postController.rPostList[index];
+    Result post = Get.find<PostController>().tvPostList[index];
     if (searchTextEditingController.text.isEmpty) {
       return GestureDetector(
-        onTap: () {
-          Get.to(SingleRadioScreen(
-            post: post,
-          ));
-        },
-        child: Container(
-          height: size.height * .4,
-          width: size.width * .3,
-          alignment: Alignment.center,
-          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12.withOpacity(0.1),
-                blurRadius: 5,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Flexible(
-                flex: 4,
-                child: FadeInImage.assetNetwork(
-                  placeholder: "assets/anim/loading.gif",
-                  image: post.image,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(
-                height: size.height * .005,
-              ),
-              Flexible(
-                flex: 1,
-                child: AutoSizeText(
-                  post.title,
-                  maxLines: 2,
-                  maxFontSize: 22,
-                  minFontSize: 12,
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+          onTap: () {
+            Get.to(SingleRadioScreen(
+              post: post,
+            ));
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: size.width * .02,
+              // vertical: size.height * .005,
+            ),
+            child: WidgetHelper.ItemPostContainer(
+              text: postController.rPostList[index].title,
+              size: size,
+              image: postController.rPostList[index].image,
+              func: () {
+                Get.to(
+                      () => SingleRadioScreen(
+                    post: postController.rPostList[index],
                   ),
-                ),
-              ),
-              SizedBox(
-                height: size.height * .01,
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  height: size.height * .025,
-                  width: size.width * .2,
-                  decoration: BoxDecoration(
-                    color: Color(0xff28F6E7),
-                    gradient: LinearGradient(colors: [
-                      Color(0xff1ED4C9),
-                      Color(0xff047677),
-                    ]),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Center(
-                    child: AutoSizeText(
-                      "ادامه مطلب",
-                      maxLines: 1,
-                      maxFontSize: 18,
-                      minFontSize: 6,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 2,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: size.width * .01, vertical: 5),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: size.width * .01,
-                      ),
-                      AutoSizeText(
-                        post.datePublished,
-                        maxLines: 4,
-                        maxFontSize: 22,
-                        minFontSize: 6,
-                        textAlign: TextAlign.start,
-                        softWrap: true,
-                        style: TextStyle(
-                          color: Colors.black38,
-                          fontSize: 10,
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.width * .02,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/Union 2.png",
-                            width: size.width * .05,
-                          ),
-                          SizedBox(
-                            width: size.width * .05,
-                          ),
-                          Image.asset("assets/images/Comment.png"),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+                );
+              },
+            ),
+          )
       );
     } else if (post.title
-            .toLowerCase()
-            .contains(searchTextEditingController.text) ||
+        .toLowerCase()
+        .contains(searchTextEditingController.text) ||
         post.title.toLowerCase().contains(searchTextEditingController.text)) {
       return GestureDetector(
         onTap: () {
@@ -929,115 +717,22 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
             post: post,
           ));
         },
-        child: Container(
-          height: size.height * .4,
-          width: size.width * .3,
-          alignment: Alignment.center,
-          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12.withOpacity(0.1),
-                blurRadius: 5,
-                spreadRadius: 2,
-              ),
-            ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: size.width * .02,
+            // vertical: size.height * .005,
           ),
-          child: Column(
-            children: [
-              Flexible(
-                flex: 4,
-                child: Image.asset(
-                  "assets/images/audio-thumbnail.png",
-                  fit: BoxFit.cover,
+          child: WidgetHelper.ItemPostContainer(
+            text: postController.rPostList[index].title,
+            size: size,
+            image: postController.rPostList[index].image,
+            func: () {
+              Get.to(
+                    () => SingleRadioScreen(
+                  post: postController.rPostList[index],
                 ),
-              ),
-              SizedBox(
-                height: size.height * .005,
-              ),
-              Flexible(
-                flex: 1,
-                child: AutoSizeText(
-                  post.title,
-                  maxLines: 2,
-                  maxFontSize: 22,
-                  minFontSize: 12,
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: size.height * .01,
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  height: size.height * .025,
-                  width: size.width * .2,
-                  decoration: BoxDecoration(
-                    color: Color(0xff28F6E7),
-                    gradient: LinearGradient(colors: [
-                      Color(0xff1ED4C9),
-                      Color(0xff047677),
-                    ]),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Center(
-                    child: AutoSizeText(
-                      "ادامه مطلب",
-                      maxLines: 1,
-                      maxFontSize: 18,
-                      minFontSize: 6,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: size.width * .01, vertical: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: size.width * .02,
-                      ),
-                      AutoSizeText(
-                        post.datePublished,
-                        maxLines: 4,
-                        maxFontSize: 22,
-                        minFontSize: 6,
-                        textAlign: TextAlign.start,
-                        softWrap: true,
-                        style: TextStyle(
-                          color: Colors.black38,
-                          fontSize: 10,
-                        ),
-                      ),
-                      SizedBox(
-                        width: size.width * .01,
-                      ),
-                      Image.asset("assets/images/Union 2.png"),
-                      SizedBox(
-                        width: size.width * .01,
-                      ),
-                      Image.asset("assets/images/Comment.png"),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       );
@@ -1045,6 +740,7 @@ class _RadioEhyeScreenState extends State<RadioEhyeScreen> {
       return Container();
     }
   }
+
 
   Widget _searchTextField() {
     return WidgetHelper.textField(

@@ -124,7 +124,7 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
             decoration: BoxDecoration(
               color: Colors.red,
               image: DecorationImage(
-                fit: BoxFit.fill,
+                fit: BoxFit.cover,
                 image: NetworkImage(widget.post.image.toString()),
               ),
               borderRadius: BorderRadius.only(
@@ -199,34 +199,43 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(50),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Image.asset(
-            "assets/images/Union 2.png",
-            width: size.width * .06,
-          ),
-          GestureDetector(
-            onTap: () {
-              buildCommentListModal();
-            },
-            child: Image.asset(
-              "assets/images/Group 128.png",
-              width: size.width * .06,
+      child: Obx(() {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () {
+                commentController.likePost(post_id: widget.post?.id?.toString());
+              },
+              child: Image.asset(
+                "assets/images/Union 2.png",
+                width: size.width * .06,
+                color:
+                    commentController.isLike.isTrue ? Colors.red : Colors.black,
+              ),
             ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Share.share(
-                  widget.post.title + "\n" + widget.post.shortDescription);
-            },
-            child: Icon(
-              Icons.share_outlined,
-              size: size.width * .065,
+            GestureDetector(
+              onTap: () {
+                buildCommentListModal();
+              },
+              child: Image.asset(
+                "assets/images/Group 128.png",
+                width: size.width * .06,
+              ),
             ),
-          ),
-        ],
-      ),
+            GestureDetector(
+              onTap: () {
+                Share.share(
+                    widget.post.title + "\n" + widget.post.shortDescription + "\n" + widget.post.shareLink);
+              },
+              child: Icon(
+                Icons.share_outlined,
+                size: size.width * .065,
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 
@@ -248,22 +257,25 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
           SizedBox(
             height: size.height * .03,
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: size.width * .1),
-            child: AutoSizeText(
-              widget.post.title,
-              maxLines: 2,
-              maxFontSize: 22,
-              minFontSize: 10,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black87, fontSize: 16),
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: size.width * .05),
+              child: AutoSizeText(
+                widget.post.title,
+                maxLines: 2,
+                maxFontSize: 22,
+                minFontSize: 10,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black87, fontSize: 16,fontWeight: FontWeight.bold),
+              ),
             ),
           ),
           SizedBox(
             height: size.height * .02,
           ),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: size.width * .05),
+            margin: EdgeInsets.symmetric(horizontal: size.width * .025),
             padding: EdgeInsets.symmetric(
                 horizontal: size.width * .03, vertical: size.height * .01),
             height: size.height * .1,
@@ -272,14 +284,14 @@ class _SinglePostScreenState extends State<SinglePostScreen> {
               color: Colors.black12,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Center(child: Html(data: widget.post.shortDescription)),
+            child: Center(child: Text(widget.post.shortDescription,overflow: TextOverflow.ellipsis)),
           ),
           SizedBox(
             height: size.height * .02,
           ),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: size.width * .06),
-              child: Html(data: widget.post.category)),
+              padding: EdgeInsets.symmetric(horizontal: size.width * .05),
+              child: Html(data: widget.post.shortDescription)),
           SizedBox(
             height: size.height * .1,
           ),

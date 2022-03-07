@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
-import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/ViewHelpers.dart';
@@ -29,6 +28,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
   Size size;
   final _formKey = GlobalKey<FormState>();
   TextEditingController pinCodeController = TextEditingController();
+  FocusNode pinCodeFocusNode = FocusNode();
 
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
@@ -51,10 +51,12 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       print(value.data);
       if (value.isDone) {
         print("ok");
+        _btnController1.reset();
         PrefHelpers.setToken(value.data['access'].toString());
         getRegistrationId();
         await getProfileByToken();
       } else {
+        _btnController1.reset();
         print("no");
         ViewHelper.showErrorDialog(context, "ورود با خطا مواجه شد");
       }
@@ -87,6 +89,12 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
         print("token not ok");
       }
     });
+  }
+
+  @override
+  void initState() {
+    pinCodeFocusNode.requestFocus();
+    super.initState();
   }
 
   @override
@@ -142,6 +150,8 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           appContext: context,
           obscureText: false,
           controller: pinCodeController,
+          autoFocus: true,
+          focusNode: pinCodeFocusNode,
           keyboardType: TextInputType.number,
           animationType: AnimationType.fade,
           errorAnimationController: errorController,
@@ -162,6 +172,13 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           onCompleted: (v) {
             print("Completed");
+            if (v.length == 4) {
+              this.pinCodeFocusNode.unfocus();
+              _btnController1.start();
+              // _doSomething();
+            } else {
+              _btnController1.stop();
+            }
           },
           onChanged: (value) {
             print(value);
@@ -207,10 +224,9 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           animateOnTap: true,
           onPressed: () {
             if (pinCodeController.text == 0 ||
-                pinCodeController.text != 11 ||
+                pinCodeController.text != 4 ||
                 _formKey.currentState.validate()) {
               _doSomething();
-              _btnController1.reset();
             } else {
               _btnController1.stop();
             }
@@ -218,5 +234,11 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    pinCodeFocusNode.dispose();
+    super.dispose();
   }
 }

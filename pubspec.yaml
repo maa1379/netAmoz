@@ -39,7 +39,7 @@ dependencies:
   http: any
   auto_size_text: ^2.1.0
   flutter_svg: ^0.22.0
-  lottie: ^0.7.0+1
+  lottie:
   accordion: ^2.1.0
   shamsi_date: ^1.0.1
   expandable: ^5.0.1
@@ -69,6 +69,7 @@ dependencies:
   firebase_core: ^1.12.0
   firebase_messaging: ^11.2.6
   flutter_local_notifications:
+  flutter_launcher_icons: ^0.9.1
 
 
 
@@ -134,3 +135,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"

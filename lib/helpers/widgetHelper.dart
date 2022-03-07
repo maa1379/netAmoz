@@ -26,6 +26,7 @@ class WidgetHelper {
     double fontSize,
     Function function,
     Function onChange,
+    Function submit,
     Size size,
     GlobalKey formKey,
     int maxLength,
@@ -55,6 +56,8 @@ class WidgetHelper {
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: fontSize),
           cursorColor: Colors.black,
+          textInputAction: TextInputAction.search,
+          onFieldSubmitted: submit,
           decoration: InputDecoration(
             prefixIcon: icon,
             disabledBorder: OutlineInputBorder(
@@ -194,7 +197,7 @@ class WidgetHelper {
                           Align(
                             alignment: Alignment.topCenter,
                             child: AutoSizeText(
-                              getProfileBlocInstance.profile.role,
+                              getProfileBlocInstance.profile.role ?? "",
                               maxLines: 1,
                               maxFontSize: 28,
                               minFontSize: 12,

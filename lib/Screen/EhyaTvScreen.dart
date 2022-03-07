@@ -237,7 +237,7 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 AutoSizeText(
-                  "بخش های ویژه",
+                  "پست های ویژه",
                   maxLines: 1,
                   maxFontSize: 22,
                   minFontSize: 10,
@@ -282,106 +282,6 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     );
   }
 
-  _buildAllCategoriesGridList() {
-    return showMaterialModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: false,
-      context: context,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: size.height * .2),
-          child: Container(
-            height: size.height * .6,
-            width: size.width,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            margin: EdgeInsets.symmetric(horizontal: size.width * .05),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(size.width * .03),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Icon(
-                              Icons.close,
-                              size: size.width * .1,
-                              color: Color(0xff7366FF),
-                            )),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(size.width * .03),
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Row(
-                          children: [
-                            AutoSizeText(
-                              "همه دسته بندی ها",
-                              maxLines: 1,
-                              maxFontSize: 22,
-                              minFontSize: 10,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Color(0xff7366FF), fontSize: 16),
-                            ),
-                            SizedBox(
-                              width: size.width * .02,
-                            ),
-                            Image.asset(
-                              "assets/images/copy.png",
-                              width: size.width * .1,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * .02),
-                    child: GridView.builder(
-                      itemCount: 20,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 5.0,
-                        mainAxisSpacing: 5.0,
-                        childAspectRatio: 1,
-                      ),
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: size.width * .005,
-                              vertical: size.height * .005),
-                          child: WidgetHelper.ItemContainer(
-                              size: size,
-                              icon: "assets/images/crona.png",
-                              text: "بخش کرونا",
-                              gColor1: Colors.red,
-                              gColor2: Colors.blue),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   _buildIcon() {
     return Container(
@@ -411,38 +311,6 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
     );
   }
 
-  _buildDropDown() {
-    return DropdownButton(
-      hint: value == null
-          ? Center(child: Text('Dropdown'))
-          : Center(
-              child: Text(
-                value,
-                style: TextStyle(color: Colors.blue),
-              ),
-            ),
-      underline: Container(),
-      isExpanded: true,
-      iconSize: 30.0,
-      // borderRadius: BorderRadius.circular(15),
-      style: TextStyle(color: Colors.blue),
-      items: ['One', 'Two', 'Three'].map(
-        (val) {
-          return DropdownMenuItem<String>(
-            value: val,
-            child: Text(val),
-          );
-        },
-      ).toList(),
-      onChanged: (val) {
-        setState(
-          () {
-            value = val;
-          },
-        );
-      },
-    );
-  }
 
   _buildListITem() {
     return Expanded(
@@ -487,9 +355,11 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
             children: [
               Flexible(
                 flex: 1,
-                child: Image.asset(
-                  "assets/images/thumbnail.png",
+                child: FadeInImage.assetNetwork(
+                  image: post.image,
+                  placeholder: "assets/anim/loading.gif",
                   fit: BoxFit.cover,
+                  width: double.maxFinite,
                 ),
               ),
               Column(
@@ -523,8 +393,9 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                       width: size.width * .55,
                       margin: EdgeInsets.only(
                           right: size.width * .05, top: size.height * .01),
-                      child: Html(
-                        data: post.shortDescription,
+                      child: Text(
+                        post.shortDescription,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
@@ -554,14 +425,6 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
                           SizedBox(
                             width: size.width * .02,
                           ),
-                          Image.asset(
-                            "assets/images/Union 2.png",
-                            width: size.width * .05,
-                          ),
-                          SizedBox(
-                            width: size.width * .02,
-                          ),
-                          Image.asset("assets/images/Comment.png"),
                           Container(
                             margin: EdgeInsets.only(right: size.width * .04),
                             height: size.height * .025,
@@ -628,9 +491,11 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
             children: [
               Flexible(
                 flex: 1,
-                child: Image.asset(
-                  "assets/images/thumbnail.png",
+                child: FadeInImage.assetNetwork(
+                  image: post.image,
+                  placeholder: "assets/anim/loading.gif",
                   fit: BoxFit.cover,
+                  width: double.maxFinite,
                 ),
               ),
               Column(
@@ -781,7 +646,6 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
           crossAxisCount: 3,
           crossAxisSpacing: 5.0,
           mainAxisSpacing: 5.0,
-          childAspectRatio: 0.52,
         ),
         itemBuilder: itemGridBuilder,
       ),
@@ -797,124 +661,24 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
             post: post,
           ));
         },
-        child: Container(
-          height: size.height * .42,
-          width: size.width * .3,
-          alignment: Alignment.center,
-          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12.withOpacity(0.1),
-                blurRadius: 5,
-                spreadRadius: 2,
-              ),
-            ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: size.width * .02,
+            // vertical: size.height * .005,
           ),
-          child: Column(
-            children: [
-              Flexible(
-                  flex: 4,
-                  child: FadeInImage.assetNetwork(
-                    placeholder: "assets/anim/loading.gif",
-                    image: post.image,
-                    fit: BoxFit.cover,
-                  )),
-              SizedBox(
-                height: size.height * .005,
-              ),
-              Flexible(
-                flex: 1,
-                child: AutoSizeText(
-                  post.title,
-                  maxLines: 2,
-                  maxFontSize: 22,
-                  minFontSize: 12,
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+          child: WidgetHelper.ItemPostContainer(
+            text: postController.tvPostList[index].title,
+            size: size,
+            image: postController.tvPostList[index].image,
+            func: () {
+              Get.to(
+                    () => SingleTvScreen(
+                  post: postController.tvPostList[index],
                 ),
-              ),
-              SizedBox(
-                height: size.height * .01,
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  height: size.height * .025,
-                  width: size.width * .2,
-                  decoration: BoxDecoration(
-                    color: Color(0xff28F6E7),
-                    gradient: LinearGradient(colors: [
-                      Color(0xff1ED4C9),
-                      Color(0xff047677),
-                    ]),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Center(
-                    child: AutoSizeText(
-                      "ادامه مطلب",
-                      maxLines: 1,
-                      maxFontSize: 18,
-                      minFontSize: 6,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 2,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: size.width * .01, vertical: 5),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: size.width * .01,
-                      ),
-                      AutoSizeText(
-                        post.datePublished,
-                        maxLines: 4,
-                        maxFontSize: 22,
-                        minFontSize: 6,
-                        textAlign: TextAlign.start,
-                        softWrap: true,
-                        style: TextStyle(
-                          color: Colors.black38,
-                          fontSize: 10,
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.width * .02,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/Union 2.png",
-                            width: size.width * .05,
-                          ),
-                          SizedBox(
-                            width: size.width * .05,
-                          ),
-                          Image.asset("assets/images/Comment.png"),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
           ),
-        ),
+        )
       );
     } else if (post.title
             .toLowerCase()
@@ -926,115 +690,22 @@ class _EhyaTvScreenState extends State<EhyaTvScreen> {
             post: post,
           ));
         },
-        child: Container(
-          height: size.height * .4,
-          width: size.width * .3,
-          alignment: Alignment.center,
-          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12.withOpacity(0.1),
-                blurRadius: 5,
-                spreadRadius: 2,
-              ),
-            ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: size.width * .02,
+            // vertical: size.height * .005,
           ),
-          child: Column(
-            children: [
-              Flexible(
-                flex: 4,
-                child: Image.asset(
-                  "assets/images/thumbnail.png",
-                  fit: BoxFit.cover,
+          child: WidgetHelper.ItemPostContainer(
+            text: postController.tvPostList[index].title,
+            size: size,
+            image: postController.tvPostList[index].image,
+            func: () {
+              Get.to(
+                    () => SingleTvScreen(
+                  post: postController.tvPostList[index],
                 ),
-              ),
-              SizedBox(
-                height: size.height * .005,
-              ),
-              Flexible(
-                flex: 1,
-                child: AutoSizeText(
-                  post.title,
-                  maxLines: 2,
-                  maxFontSize: 22,
-                  minFontSize: 12,
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: size.height * .01,
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  height: size.height * .025,
-                  width: size.width * .2,
-                  decoration: BoxDecoration(
-                    color: Color(0xff28F6E7),
-                    gradient: LinearGradient(colors: [
-                      Color(0xff1ED4C9),
-                      Color(0xff047677),
-                    ]),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Center(
-                    child: AutoSizeText(
-                      "ادامه مطلب",
-                      maxLines: 1,
-                      maxFontSize: 18,
-                      minFontSize: 6,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: size.width * .01, vertical: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: size.width * .02,
-                      ),
-                      AutoSizeText(
-                        post.datePublished,
-                        maxLines: 4,
-                        maxFontSize: 22,
-                        minFontSize: 6,
-                        textAlign: TextAlign.start,
-                        softWrap: true,
-                        style: TextStyle(
-                          color: Colors.black38,
-                          fontSize: 10,
-                        ),
-                      ),
-                      SizedBox(
-                        width: size.width * .01,
-                      ),
-                      Image.asset("assets/images/Union 2.png"),
-                      SizedBox(
-                        width: size.width * .01,
-                      ),
-                      Image.asset("assets/images/Comment.png"),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       );

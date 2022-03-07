@@ -77,27 +77,12 @@ class PostController extends GetxController {
             ));
       }
     });
-
-
-
-
-
-
-
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    //   RemoteNotification notification = message.notification;
-    //   log('new message');
-    //   print(message.notification.title);
-    //   print(message.notification.body);
-    //   if (message is RemoteMessage) {
-    //     Get.snackbar(
-    //       message.notification?.title ?? '',
-    //       message.notification?.body ?? '',
-    //       backgroundColor: Colors.white.withOpacity(0.9),
-    //     );
-    //   }
-    // });
   }
+
+
+
+
+
 
   ScrollController postController = ScrollController();
 
@@ -210,18 +195,12 @@ class PostController extends GetxController {
         });
         hasSearch.value = true;
         loadingSearch.value = true;
-        get();
       } else {
         loadingSearch.value = false;
       }
     });
   }
 
-  get() async {
-    print("**************");
-    print(await PrefHelpers.getList());
-    print("**************");
-  }
 
   getTVPost() async {
     RequestHelper.posts(
@@ -329,6 +308,7 @@ class CategoryController extends GetxController {
 class CommentController extends GetxController {
   RxBool isSend = false.obs;
   RxBool isReply = false.obs;
+  RxBool loading = false.obs;
   RxList<Comment> commentList = <Comment>[].obs;
   TextEditingController textController = TextEditingController();
 
@@ -354,6 +334,21 @@ class CommentController extends GetxController {
     );
   }
 
+
+  RxBool isLike = false.obs;
+
+
+  likePost({String post_id})async{
+    RequestHelper.likePost(token: await PrefHelpers.getToken(),post_id: post_id).then((value){
+      if(value.isDone){
+        GetSinglePost(postID: post_id);
+        isLike.value = value.data['liked'];
+      }
+    });
+  }
+
+
+
   SinglePostModel singlePost;
 
   GetSinglePost({String postID}) async {
@@ -361,9 +356,12 @@ class CommentController extends GetxController {
         .then((value) {
       if (value.isDone) {
         singlePost = SinglePostModel.fromJson(value.data);
-
+        this.isLike.value = singlePost.liked;
         commentList.addAll(singlePost.comments);
+        this.loading.value = true;
+        EasyLoading.dismiss();
       } else {
+        this.loading.value = false;
         print("no");
       }
     });

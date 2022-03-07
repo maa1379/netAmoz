@@ -35,6 +35,7 @@ enum WebMethods {
   create_get_treasure,
   treasure_message,
   retrieve_treasure,
+  activity_point,
 }
 
 class RequestHelper {
@@ -502,6 +503,24 @@ class RequestHelper {
     );
   }
 
+
+
+
+  static Future<ApiResult> activityPoint(
+      {String token}) async {
+    return await RequestHelper._makeRequestPost(
+        webController: WebControllers.auth,
+        webMethod: WebMethods.activity_point,
+        header: {
+          'Accept': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer ${token}"
+        }).timeout(
+      Duration(seconds: 50),
+    );
+  }
+
+
+
 //  **************************************************************************
 //  **************************************************************************
 //  **************************************************************************
@@ -553,7 +572,46 @@ class RequestHelper {
   }
 
 
+  static Future<ApiResult> likePost({
+    String token,
+    String post_id,
+  }) async {
+    String url = "http://87.107.172.122/api/home/like/$post_id";
+    print(url);
+    http.Response response = await http.post(Uri.parse(url),headers: {
+      'Accept': 'application/json',
+      HttpHeaders.authorizationHeader: "Bearer ${token}"
+    });
+    ApiResult apiResult = new ApiResult();
+    apiResult.statusCode = response.statusCode;
+    if (response.statusCode == 200) {
+      try {
+        print(response.body);
+        Map data = jsonDecode(response.body);
+        apiResult.isDone = data['isDone'] == true;
+        apiResult.requestedMethod = data['requestedMethod'].toString();
+        apiResult.data = data['data'];
+      } catch (e) {
+        apiResult.isDone = false;
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
+        print(response.body);
 
+        apiResult.requestedMethod = 'fcm';
+        apiResult.data = response.body;
+      }
+    } else {
+      apiResult.isDone = true;
+    }
+    print("\nRequest url: $url\nResponse: {"
+        "status: ${response.statusCode}\n"
+        "isDone: ${apiResult.isDone}\n"
+        "data: ${apiResult.data}"
+        "}");
+    return apiResult;
+  }
 
 
 

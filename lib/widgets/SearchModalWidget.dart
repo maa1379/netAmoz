@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ehyasalamat/Screen/SinglePostScreen.dart';
 import 'package:ehyasalamat/Screen/SingleRadioScreen.dart';
@@ -7,16 +5,11 @@ import 'package:ehyasalamat/Screen/SingleTvScreen.dart';
 import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/AlertHelper.dart';
 import 'package:ehyasalamat/helpers/ImageHelpers.dart';
-import 'package:ehyasalamat/helpers/PrefHelpers.dart';
-import 'package:ehyasalamat/helpers/RequestHelper.dart';
 import 'package:ehyasalamat/helpers/loading.dart';
-import 'package:ehyasalamat/helpers/prefHelper.dart';
 import 'package:ehyasalamat/helpers/widgetHelper.dart';
-import 'package:ehyasalamat/models/MediaModel.dart';
 import 'package:ehyasalamat/models/PostModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:page_transition/page_transition.dart';
 
 class SearchModalWidget extends StatefulWidget {
@@ -197,11 +190,25 @@ class _SearchModalWidgetState extends State<SearchModalWidget> {
         height: size.height * .08,
         color: Color(0xfff8ffff),
         size: size,
-        onChange: (String str) async {
+        submit: (str) {
           if (str.isNotEmpty) {
             postController.Search(q: str);
             postController.hasSearch.value = true;
             postController.listOfHistory.add(str);
+          }
+          if (str.isEmpty) {
+            postController.hasSearch.value = false;
+            postController.loadingSearch.value = false;
+          }
+          postController.allPostListS.clear();
+          postController.postListS.clear();
+          postController.tvPostListS.clear();
+          postController.rPostListS.clear();
+        },
+        onChange: (String str) async {
+          if (str.isNotEmpty) {
+            postController.Search(q: str);
+            postController.hasSearch.value = true;
           }
           if (str.isEmpty) {
             postController.hasSearch.value = false;

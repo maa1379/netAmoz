@@ -43,11 +43,6 @@ class PostModel {
       };
 }
 
-// To parse this JSON data, do
-//
-//     final result = resultFromJson(jsonString);
-
-
 class Result {
   Result({
     this.id,
@@ -55,13 +50,16 @@ class Result {
     this.category,
     this.image,
     this.file,
+    this.shareLink,
+    this.liked,
+    this.likesCount,
     this.shortDescription,
     this.tags,
     this.linkTv,
     this.radioEhya,
+    this.specialPost,
     this.ehyaTv,
     this.published,
-    this.specialPost,
     this.datePublished,
   });
 
@@ -70,13 +68,16 @@ class Result {
   String category;
   String image;
   String file;
+  String shareLink;
+  bool liked;
+  int likesCount;
   String shortDescription;
   List<Tag> tags;
   String linkTv;
   bool radioEhya;
+  bool specialPost;
   bool ehyaTv;
   bool published;
-  bool specialPost;
   String datePublished;
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
@@ -85,13 +86,16 @@ class Result {
     category: json["category"],
     image: json["image"],
     file: json["file"],
+    shareLink: json["share_link"],
+    liked: json["liked"],
+    likesCount: json["likes_count"],
     shortDescription: json["short_description"],
     tags: List<Tag>.from(json["tags"].map((x) => Tag.fromJson(x))),
     linkTv: json["link_tv"],
     radioEhya: json["radio_ehya"],
+    specialPost: json["special_post"],
     ehyaTv: json["ehya_tv"],
     published: json["published"],
-    specialPost: json["special_post"],
     datePublished: json["date_published"],
   );
 
@@ -101,17 +105,19 @@ class Result {
     "category": category,
     "image": image,
     "file": file,
+    "share_link": shareLink,
+    "liked": liked,
+    "likes_count": likesCount,
     "short_description": shortDescription,
     "tags": List<dynamic>.from(tags.map((x) => x.toJson())),
     "link_tv": linkTv,
     "radio_ehya": radioEhya,
+    "special_post": specialPost,
     "ehya_tv": ehyaTv,
     "published": published,
-    "special_post": specialPost,
     "date_published": datePublished,
   };
 }
-
 
 class Tag {
   Tag({
@@ -123,12 +129,12 @@ class Tag {
   String name;
 
   factory Tag.fromJson(Map<String, dynamic> json) => Tag(
-        id: json["id"],
-        name: json["name"],
-      );
+    id: json["id"],
+    name: json["name"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-      };
+    "id": id,
+    "name": name,
+  };
 }

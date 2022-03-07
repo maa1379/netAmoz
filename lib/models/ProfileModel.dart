@@ -33,7 +33,6 @@ class ProfileModel {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
     phoneNumber: json["phone_number"],
-    role: json["role"],
     firstName: json["first_name"],
     lastName: json["last_name"],
     province: json["province"],

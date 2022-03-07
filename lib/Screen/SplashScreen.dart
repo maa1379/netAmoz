@@ -1,20 +1,18 @@
-import 'dart:developer';
-
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:ehyasalamat/controllers/PostController.dart';
-import 'package:ehyasalamat/helpers/ViewHelpers.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:ehyasalamat/Screen/HomeScareen.dart';
 import 'package:ehyasalamat/bloc/ProfileBloc.dart';
+import 'package:ehyasalamat/controllers/PostController.dart';
 import 'package:ehyasalamat/helpers/NavHelper.dart';
 import 'package:ehyasalamat/helpers/PrefHelpers.dart';
 import 'package:ehyasalamat/helpers/RequestHelper.dart';
+import 'package:ehyasalamat/helpers/ViewHelpers.dart';
 import 'package:ehyasalamat/models/ProfileModel.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
+
 import 'IntroScreen.dart';
-import 'package:connectivity/connectivity.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -23,7 +21,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Size size;
-
 
   void checkInternet() async {
     var con = await (Connectivity().checkConnectivity());
@@ -43,8 +40,18 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
   }
 
-
-
+  timer() async {
+    Future.delayed(Duration(minutes: 5)).then((value) async {
+      RequestHelper.activityPoint(token: await PrefHelpers.getToken())
+          .then((value) {
+        if (value.isDone) {
+          ViewHelper.showSuccessDialog(Get.context, "شما امتیاز گرفتید");
+        } else {
+          print("not point");
+        }
+      });
+    });
+  }
 
   getProfileByToken() async {
     RequestHelper.getProfile(token: await PrefHelpers.getToken()).then((value) {
@@ -55,6 +62,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Get.put(CategoryController());
         Future.delayed(Duration(seconds: 5)).then((value) {
           NavHelper.pushR(context, HomeScreen());
+          timer();
         });
       } else {
         Future.delayed(Duration(seconds: 5)).then((value) {
